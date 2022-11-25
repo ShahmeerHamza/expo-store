@@ -6,15 +6,14 @@ import {
   Dimensions,
   Image,
 } from "react-native";
-import { intlFormatDistance } from "date-fns";
 import React from "react";
+import { formatDistance } from "date-fns";
 
 const CustomerCard = ({
   order_Data,
-  handleDeliver,
-  handleVisit,
   navigation,
 }) => {
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -27,7 +26,7 @@ const CustomerCard = ({
           <Text style={{ fontSize: 18, fontWeight: "500" }}>Customer Name</Text>
           {/* <Text style={{ position: "absolute", right: 10, top: 5 }}>{format(new Date(order_Data.created_at) - new Date(), "H:m")}</Text> */}
           <Text style={{ position: "absolute", right: 10, top: 5, color: "#009387", fontSize: 11 }}>
-            {intlFormatDistance(new Date(order_Data.created_at), new Date())}
+            {formatDistance(new Date(order_Data.created_at), new Date())}
           </Text>
           <Text
             style={{

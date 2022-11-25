@@ -56,7 +56,7 @@ const Home = ({ navigation, route }) => {
             </View>
 
             <View style={styles.card_container}>
-              <Cards navigation={navigation} route={"OrdersScreen"} image={orderProductLogo} title={'Create Orders'} />
+              <Cards navigation={navigation} route={"OrdersScreen"} image={orderProductLogo} title={'Orders'} />
               <Cards navigation={navigation} route={"History"} image={orderHistoryLogo} title={'History'} />
             </View>
           </>

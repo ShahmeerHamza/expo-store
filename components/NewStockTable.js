@@ -36,8 +36,8 @@ export default function NewStockTable({ data }) {
                 }}
             />  */}
             {
-                data?.map((item) => (
-                    <View style={styles.dataTableCell}>
+                data?.map((item, index) => (
+                    <View style={styles.dataTableCell} key={index}>
                         <View style={{ flexDirection: "row" }}>
                             <Image
                                 style={styles.dataTableCellImg}

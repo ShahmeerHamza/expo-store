@@ -12,27 +12,21 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import ProductDropdown from "./ProductDropdown";
-// import UserContext from "../context/users";
 import axios from "axios";
 import {
     productDetailAdminApi,
     salesManPlaceOrderApi,
-    salesManRequestOrderApi,
     viewCustomerApi,
 } from "../api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import UserContext from "../context/users/userContext";
 import { RadioButton } from 'react-native-paper';
-// import { id } from "date-fns/locale";
-import OrdersListScreen from './OrdersListScreen';
-import ProductAndQuantityOrderDetail from "./ProductAndQuantityOrderDetail";
 import { useNavigation } from '@react-navigation/native';
 
 
 const AssignProducts = ({ }) => {
     const navigation = useNavigation();
 
-    // console.log('productQuantity', productQuantity)
     const [selectedId, setSelectedId] = useState(0);
     const [data, setData] = useState([]);
     const [customerName, setCustomerName] = useState([]);
@@ -42,13 +36,8 @@ const AssignProducts = ({ }) => {
     const [selectedProduct, setSelectedProduct] = useState([]);
     const [status, setStatus] = useState('Order');
     const [productQuantityCollection, setProductQuantityCollection] = useState([])
-    // const [selectedProducts, setSelectedProducts] = useState([])
 
-    // const handleCreateOrder = () => {
-    //     setCreateOrderCheck(!createOrderCheck)
-    // }
     const handleIdSelection = (id) => {
-        // console.log('name', id)
         setSelectedId(id);
     };
 
@@ -62,16 +51,12 @@ const AssignProducts = ({ }) => {
             return;
         }
 
-
         const item = data.find((el) => {
             return el.key === id;
         });
-        // console.log('item', item);
         const temp = [...selectedProduct];
         temp.push(item);
         setSelectedProduct(temp);
-        // console.log('selectedProduct', selectedProduct)
-
     };
 
     const user = useContext(UserContext);
@@ -84,8 +69,6 @@ const AssignProducts = ({ }) => {
         },
     };
 
-
-
     const onchangeInput = (val, id) => {
         let foundIndex = selectedProduct.findIndex(x => x.key === id);
         productQuantityCollection[foundIndex] = { pId: id, quantity: val };
@@ -93,7 +76,6 @@ const AssignProducts = ({ }) => {
     }
 
     const handleRequestOrderSubmit = async () => {
-        // console.log('productQuantityCollection', productQuantityCollection)
         if (!selectedId) {
             alert("Please select Customer Name!");
             setLoadingSubmit(false);
@@ -104,10 +86,7 @@ const AssignProducts = ({ }) => {
             setLoadingSubmit(false);
             return
         }
-        // else if (!productQuantity) {
-        //     setLoadingSubmit(false);
-        //     return alert("Enter product quantity!");
-        // }
+
         else {
             try {
                 await axios.post(salesManPlaceOrderApi, {
@@ -167,7 +146,6 @@ const AssignProducts = ({ }) => {
     }, []);
 
     const selectedProductDeleteHandler = (id) => {
-        // console.log('id', id)
         const newArr1 = productQuantityCollection.filter(item => item.pId !== id);
         setProductQuantityCollection(newArr1);
 
@@ -187,60 +165,60 @@ const AssignProducts = ({ }) => {
                     {error ? (
                         <Text>Error loading products please try again later</Text>
                     ) : data.length ? (
-                        // <ScrollView>
-                        <View style={styles.container}>
+                        <ScrollView>
+                            <View style={styles.container}>
 
-                            <View style={styles.dropdown_container}>
-                                <Text style={{ fontSize: 20, marginVertical: 10, fontWeight: "500" }}>
-                                    Customer Name
-                                </Text>
-                                <ProductDropdown
-                                    data={customerName}
-                                    handleIdSelection={handleIdSelection}
-                                />
-                            </View>
-                            <View style={{ flexDirection: "row", width: "100%", marginTop: 23 }}>
-                                <Text style={{ fontSize: 20, fontWeight: "500" }}>Status :</Text>
-                                <View style={{ flexDirection: "row", marginLeft: 15 }}>
-                                    <Text style={{ fontSize: 18, marginTop: 3 }}>Order</Text>
-                                    <RadioButton
-                                        value="Order"
-                                        status={status === 'Order' ? 'checked' : 'unchecked'}
-                                        onPress={() => setStatus("Order")}
-                                    />
-                                </View>
-                                <View style={{ flexDirection: "row", marginLeft: 15 }}>
-                                    <Text style={{ fontSize: 18, marginTop: 3 }}>Visit</Text>
-
-                                    <RadioButton
-                                        value="visit"
-                                        status={status === 'visit' ? 'checked' : 'unchecked'}
-                                        onPress={() => setStatus("visit")}
-                                    />
-                                </View>
-                            </View>
-
-                            {status === 'Order' ? <>
                                 <View style={styles.dropdown_container}>
                                     <Text style={{ fontSize: 20, marginVertical: 10, fontWeight: "500" }}>
-                                        Product Name
+                                        Customer Name
                                     </Text>
                                     <ProductDropdown
-                                        data={data}
-                                        handleIdSelection={handleProductSelection}
+                                        data={customerName}
+                                        handleIdSelection={handleIdSelection}
                                     />
                                 </View>
+                                <View style={{ flexDirection: "row", width: "100%", marginTop: 23 }}>
+                                    <Text style={{ fontSize: 20, fontWeight: "500" }}>Status :</Text>
+                                    <View style={{ flexDirection: "row", marginLeft: 15 }}>
+                                        <Text style={{ fontSize: 18, marginTop: 3 }}>Order</Text>
+                                        <RadioButton
+                                            value="Order"
+                                            status={status === 'Order' ? 'checked' : 'unchecked'}
+                                            onPress={() => setStatus("Order")}
+                                        />
+                                    </View>
+                                    <View style={{ flexDirection: "row", marginLeft: 15 }}>
+                                        <Text style={{ fontSize: 18, marginTop: 3 }}>Visit</Text>
+
+                                        <RadioButton
+                                            value="visit"
+                                            status={status === 'visit' ? 'checked' : 'unchecked'}
+                                            onPress={() => setStatus("visit")}
+                                        />
+                                    </View>
+                                </View>
+
+                                {status === 'Order' ? <>
+                                    <View style={styles.dropdown_container}>
+                                        <Text style={{ fontSize: 20, marginVertical: 10, fontWeight: "500" }}>
+                                            Product Name
+                                        </Text>
+                                        <ProductDropdown
+                                            data={data}
+                                            handleIdSelection={handleProductSelection}
+                                        />
+                                    </View>
 
 
-                                <FlatList
-                                    data={selectedProduct}
-                                    keyExtractor={(item) => item.id}
-                                    renderItem={({ item }) => {
-                                        // console.log('item', item)
+                                    {/* <FlatList
+                                        data={selectedProduct}
+                                        keyExtractor={(item) => item.id}
+                                        renderItem={({ item }) => { */}
+                                    {selectedProduct.map((item, index) => {
                                         return (
                                             <View
+                                                key={index}
                                                 style={{
-                                                    // borderWidth: 1,
                                                     width: (Dimensions.get("window").width / 100) * 70,
                                                 }}
                                             >
@@ -262,7 +240,7 @@ const AssignProducts = ({ }) => {
                                                     }}
                                                     onChangeText={(val) => { onchangeInput(val, item.key) }}
                                                     placeholder={`Enter ${item.value} quantity`}
-                                                    value={productQuantityCollection.find(({ pId }) => pId === item.key)?.quantity}
+                                                    value={productQuantityCollection.find((e) => e?.pId === item.key)?.quantity}
                                                     keyboardType="numeric"
                                                 />
                                                 <TouchableOpacity
@@ -282,39 +260,41 @@ const AssignProducts = ({ }) => {
                                                         style={{}}
                                                     />
                                                 </TouchableOpacity>
-
-
-
                                             </View>
-                                        );
-                                    }}
-                                />
-                            </> : null}
+                                        )
+                                    })
 
 
-                            <TouchableOpacity
-                                onPress={handleRequestOrderSubmit}
-                                style={styles.linear_button}
-                            >
-                                <LinearGradient
+                                    }
+                                    {/* }}
+                                    /> */}
+
+
+                                </> : null}
+
+
+                                <TouchableOpacity
+                                    onPress={handleRequestOrderSubmit}
                                     style={styles.linear_button}
-                                    colors={["#08d4c4", "#01ab9d"]}
                                 >
-                                    <Text style={styles.button_text}>
-                                        {loadingSubmit ? <ActivityIndicator /> : "Submit"}
-                                    </Text>
-                                </LinearGradient>
-                            </TouchableOpacity>
+                                    <LinearGradient
+                                        style={styles.linear_button}
+                                        colors={["#08d4c4", "#01ab9d"]}
+                                    >
+                                        <Text style={styles.button_text}>
+                                            {loadingSubmit ? <ActivityIndicator /> : "Submit"}
+                                        </Text>
+                                    </LinearGradient>
+                                </TouchableOpacity>
 
-                        </View>
-                        // </ScrollView>
+                            </View>
+                        </ScrollView>
                     ) : (
                         <Text>No products found</Text>
                     )}
                 </>
             )}
             <View style={{ width: "100%", height: "auto" }}>
-                {/* <ProductAndQuantityOrderDetail /> */}
             </View>
 
         </>
@@ -352,18 +332,14 @@ const styles = StyleSheet.create({
     },
 
     input_num: {
-        // flex: 1,
         width: "100%",
         height: 50,
         backgroundColor: "#fff",
         borderRadius: 10,
         borderColor: "grey",
         borderWidth: 1,
-        // marginHorizontal: 40,
         textAlign: "left",
-        // marginVertical: 20,
         paddingLeft: 20,
-        // padding: 15,
         color: "black",
     },
     linear_button: {
@@ -373,7 +349,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: 10,
         margin: 20,
-        // marginBottom: 0
     },
     button_text: {
         color: "white",

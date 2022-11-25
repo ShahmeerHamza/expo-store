@@ -8,12 +8,11 @@ import React, { useContext, useEffect, useState } from "react";
 import CustomerCard from "./CustomerCard";
 import UserContext from "../context/users/userContext";
 import axios from "axios";
-import { myOrders, viewCustomerApi } from "../api";
+import { myOrders } from "../api";
 
 const OrdersListScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
-    const [ordersData, setOrdersData] = useState(null);
-    // console.log('customersData', customersData)
+    const [ordersData, setOrdersData] = useState([]);
 
     const user = useContext(UserContext);
 
@@ -29,7 +28,7 @@ const OrdersListScreen = ({ navigation }) => {
         try {
             const response = await axios.get(myOrders, headers);
             setOrdersData(response.data.data.reverse());
-            console.log('response--------------------', response.data.data);
+            // console.log('response--------------------', response.data.data.reverse());
             setLoading(false);
         } catch (error) {
             console.log("error------------------------", error);
@@ -43,7 +42,7 @@ const OrdersListScreen = ({ navigation }) => {
     }, []);
     return (
         <>
-            {loading ? (
+            {loading && !ordersData?.length ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size={35} />
                 </View>
