@@ -119,8 +119,8 @@ const Login = ({ navigation }) => {
           <AppForm
             validationSchema={validationSchema}
             initialValues={{
-              email: "usman@gmail.com",
-              password: "password",
+              email: "",
+              password: "",
               device_name: "mobile",
             }}
             onSubmit={(values, { resetForm }) => handleLogin(values, resetForm)}

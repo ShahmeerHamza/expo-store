@@ -187,127 +187,127 @@ const AssignProducts = ({ }) => {
                     {error ? (
                         <Text>Error loading products please try again later</Text>
                     ) : data.length ? (
-                        <ScrollView>
-                            <View style={styles.container}>
+                        // <ScrollView>
+                        <View style={styles.container}>
 
+                            <View style={styles.dropdown_container}>
+                                <Text style={{ fontSize: 20, marginVertical: 10, fontWeight: "500" }}>
+                                    Customer Name
+                                </Text>
+                                <ProductDropdown
+                                    data={customerName}
+                                    handleIdSelection={handleIdSelection}
+                                />
+                            </View>
+                            <View style={{ flexDirection: "row", width: "100%", marginTop: 23 }}>
+                                <Text style={{ fontSize: 20, fontWeight: "500" }}>Status :</Text>
+                                <View style={{ flexDirection: "row", marginLeft: 15 }}>
+                                    <Text style={{ fontSize: 18, marginTop: 3 }}>Order</Text>
+                                    <RadioButton
+                                        value="Order"
+                                        status={status === 'Order' ? 'checked' : 'unchecked'}
+                                        onPress={() => setStatus("Order")}
+                                    />
+                                </View>
+                                <View style={{ flexDirection: "row", marginLeft: 15 }}>
+                                    <Text style={{ fontSize: 18, marginTop: 3 }}>Visit</Text>
+
+                                    <RadioButton
+                                        value="visit"
+                                        status={status === 'visit' ? 'checked' : 'unchecked'}
+                                        onPress={() => setStatus("visit")}
+                                    />
+                                </View>
+                            </View>
+
+                            {status === 'Order' ? <>
                                 <View style={styles.dropdown_container}>
                                     <Text style={{ fontSize: 20, marginVertical: 10, fontWeight: "500" }}>
-                                        Customer Name
+                                        Product Name
                                     </Text>
                                     <ProductDropdown
-                                        data={customerName}
-                                        handleIdSelection={handleIdSelection}
+                                        data={data}
+                                        handleIdSelection={handleProductSelection}
                                     />
                                 </View>
-                                <View style={{ flexDirection: "row", width: "100%", marginTop: 23 }}>
-                                    <Text style={{ fontSize: 20, fontWeight: "500" }}>Status :</Text>
-                                    <View style={{ flexDirection: "row", marginLeft: 15 }}>
-                                        <Text style={{ fontSize: 18, marginTop: 3 }}>Order</Text>
-                                        <RadioButton
-                                            value="Order"
-                                            status={status === 'Order' ? 'checked' : 'unchecked'}
-                                            onPress={() => setStatus("Order")}
-                                        />
-                                    </View>
-                                    <View style={{ flexDirection: "row", marginLeft: 15 }}>
-                                        <Text style={{ fontSize: 18, marginTop: 3 }}>Visit</Text>
-
-                                        <RadioButton
-                                            value="visit"
-                                            status={status === 'visit' ? 'checked' : 'unchecked'}
-                                            onPress={() => setStatus("visit")}
-                                        />
-                                    </View>
-                                </View>
-
-                                {status === 'Order' ? <>
-                                    <View style={styles.dropdown_container}>
-                                        <Text style={{ fontSize: 20, marginVertical: 10, fontWeight: "500" }}>
-                                            Product Name
-                                        </Text>
-                                        <ProductDropdown
-                                            data={data}
-                                            handleIdSelection={handleProductSelection}
-                                        />
-                                    </View>
 
 
-                                    <FlatList
-                                        data={selectedProduct}
-                                        keyExtractor={(item) => item.id}
-                                        renderItem={({ item }) => {
-                                            // console.log('item', item)
-                                            return (
-                                                <View
+                                <FlatList
+                                    data={selectedProduct}
+                                    keyExtractor={(item) => item.id}
+                                    renderItem={({ item }) => {
+                                        // console.log('item', item)
+                                        return (
+                                            <View
+                                                style={{
+                                                    // borderWidth: 1,
+                                                    width: (Dimensions.get("window").width / 100) * 70,
+                                                }}
+                                            >
+                                                <Text
                                                     style={{
-                                                        // borderWidth: 1,
-                                                        width: (Dimensions.get("window").width / 100) * 70,
+                                                        fontSize: 17,
+                                                        textTransform: "capitalize",
+                                                        paddingTop: 8,
                                                     }}
                                                 >
-                                                    <Text
-                                                        style={{
-                                                            fontSize: 17,
-                                                            textTransform: "capitalize",
-                                                            paddingTop: 8,
-                                                        }}
-                                                    >
-                                                        {item.value}
-                                                    </Text>
-                                                    <TextInput
-                                                        style={{
-                                                            width: "100%",
-                                                            padding: 10,
-                                                            borderBottomWidth: 1,
-                                                            fontSize: 15,
-                                                        }}
-                                                        onChangeText={(val) => { onchangeInput(val, item.key) }}
-                                                        placeholder={`Enter ${item.value} quantity`}
-                                                        value={productQuantityCollection.find(({ pId }) => pId === item.key)?.quantity}
-                                                        keyboardType="numeric"
+                                                    {item.value}
+                                                </Text>
+                                                <TextInput
+                                                    style={{
+                                                        width: "100%",
+                                                        padding: 10,
+                                                        borderBottomWidth: 1,
+                                                        fontSize: 15,
+                                                    }}
+                                                    onChangeText={(val) => { onchangeInput(val, item.key) }}
+                                                    placeholder={`Enter ${item.value} quantity`}
+                                                    value={productQuantityCollection.find(({ pId }) => pId === item.key)?.quantity}
+                                                    keyboardType="numeric"
+                                                />
+                                                <TouchableOpacity
+                                                    onPress={() => selectedProductDeleteHandler(item.key)}
+                                                    style={{
+                                                        width: 35,
+                                                        height: "auto",
+                                                        position: "absolute",
+                                                        right: 7,
+                                                        top: 25,
+                                                    }}
+                                                >
+                                                    <MaterialCommunityIcons
+                                                        name="delete"
+                                                        size={29}
+                                                        color="#01ab9d"
+                                                        style={{}}
                                                     />
-                                                    <TouchableOpacity
-                                                        onPress={() => selectedProductDeleteHandler(item.key)}
-                                                        style={{
-                                                            width: 35,
-                                                            height: "auto",
-                                                            position: "absolute",
-                                                            right: 7,
-                                                            top: 25,
-                                                        }}
-                                                    >
-                                                        <MaterialCommunityIcons
-                                                            name="delete"
-                                                            size={29}
-                                                            color="#01ab9d"
-                                                            style={{}}
-                                                        />
-                                                    </TouchableOpacity>
+                                                </TouchableOpacity>
 
 
 
-                                                </View>
-                                            );
-                                        }}
-                                    />
-                                </> : null}
+                                            </View>
+                                        );
+                                    }}
+                                />
+                            </> : null}
 
 
-                                <TouchableOpacity
-                                    onPress={handleRequestOrderSubmit}
+                            <TouchableOpacity
+                                onPress={handleRequestOrderSubmit}
+                                style={styles.linear_button}
+                            >
+                                <LinearGradient
                                     style={styles.linear_button}
+                                    colors={["#08d4c4", "#01ab9d"]}
                                 >
-                                    <LinearGradient
-                                        style={styles.linear_button}
-                                        colors={["#08d4c4", "#01ab9d"]}
-                                    >
-                                        <Text style={styles.button_text}>
-                                            {loadingSubmit ? <ActivityIndicator /> : "Submit"}
-                                        </Text>
-                                    </LinearGradient>
-                                </TouchableOpacity>
+                                    <Text style={styles.button_text}>
+                                        {loadingSubmit ? <ActivityIndicator /> : "Submit"}
+                                    </Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
 
-                            </View>
-                        </ScrollView>
+                        </View>
+                        // </ScrollView>
                     ) : (
                         <Text>No products found</Text>
                     )}
