@@ -1,12 +1,13 @@
 import {
     ActivityIndicator,
+    BackHandler,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import UserContext from "./context/users/userContext";
 import axios from "axios";
@@ -75,6 +76,20 @@ export default function CreateCustomer({ navigation }) {
             }
         }
     };
+
+    function handleBackButtonClick() {
+        navigation.goBack();
+        return true;
+    }
+
+    useEffect(() => {
+        BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
+        return () => {
+            BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
+        };
+    }, []);
+
+
 
     return (
         <View style={styles.container}>
@@ -201,4 +216,4 @@ const styles = StyleSheet.create({
     button_text: {
         color: "white",
     },
-});
+})

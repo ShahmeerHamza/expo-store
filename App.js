@@ -20,11 +20,12 @@ import AssignProducts from './components/AssignProducts'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import OrdersListScreen from './components/OrdersListScreen';
 import ProductAndQuantityOrderDetail from "./components/ProductAndQuantityOrderDetail";
+import CustomerHistoryCard from './components/CustomerHistoryCard';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
 
-  // console.log('user', user)
+  // console.log('user', user)getOrdersUpdateState
 
   return (
     <UsersState>
@@ -183,10 +184,18 @@ export default function App() {
 
             <Stack.Screen
               options={{
-                title: "Product Detail",
+                title: "Order Detail",
               }}
               name="ProductDetail"
               component={ProductAndQuantityOrderDetail}
+            />
+
+            <Stack.Screen
+              options={{
+                title: "History detail",
+              }}
+              name="Historydetail"
+              component={CustomerHistoryCard}
             />
 
             <Stack.Screen

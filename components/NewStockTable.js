@@ -2,6 +2,7 @@ import { Image, StyleSheet, Text, View, FlatList, Dimensions } from "react-nativ
 import React from "react";
 
 export default function NewStockTable({ data }) {
+    console.log('data', data)
     return (
         <View style={styles.dataTable}>
             {/* <FlatList
@@ -46,7 +47,8 @@ export default function NewStockTable({ data }) {
                             <View style={{ marginLeft: 10 }}>
                                 <Text style={styles.headerTxt}>Product Name</Text>
                                 <Text style={styles.dataTableCellText}>
-                                    {item.name ? item.name : item.products[0].name}
+                                    {/* {item.name ? item.name : item.products[0].name} */}
+                                    {item.product.name}
                                 </Text>
                             </View>
                         </View>
@@ -58,9 +60,10 @@ export default function NewStockTable({ data }) {
                                             item.product_stock + data[index - 1].product_stock :
                                             item.product_stock
                                     } */}
-                                {item?.pivot?.quantity
+                                {/* {item?.pivot?.quantity
                                     ? item.pivot.quantity
-                                    : item.product_stock}
+                                    : item.product_stock} */}
+                                {item.quantity}
                             </Text>
                         </View>
                     </View>
@@ -103,6 +106,7 @@ const styles = StyleSheet.create({
     dataTableCellText: {
         fontSize: 16,
         fontWeight: "600",
+        textTransform: "capitalize"
     },
     dataTableCellQty: {
         fontSize: 18,

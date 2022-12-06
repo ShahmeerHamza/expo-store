@@ -6,6 +6,8 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     ScrollView,
+    BackHandler,
+    Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import StockTable from "./components/StockTable";
@@ -18,7 +20,7 @@ import StoreKeeperContext from "./context/storeKeeper/storeKeeperContext";
 const Stock = ({ navigation, route }) => {
     const [showModal, setShowModal] = useState(false);
     const [salesManStockData, setSalesManStockData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     // console.log('data------------>', salesManStockData)
 
     const { _response } = api;
@@ -89,16 +91,16 @@ const Stock = ({ navigation, route }) => {
         try {
             if (route.params === "storekeeper") {
                 const response = await axios.get(
-                    `${StoreKeeperStockApi}/${user.userState.id}`,
+                    `${StoreKeeperStockApi}`,
                     headers
                 );
                 const { data } = _response(response);
-                storeKeeper.setAssignedProducts(data.assigned_products);
+                storeKeeper.setAssignedProducts(data);
                 setLoading(false);
             } else {
                 const response1 = await axios.get(viewSalesManStock, headers);
                 const resData = _response(response1);
-                setSalesManStockData(resData.data.reverse());
+                setSalesManStockData(resData.data);
                 // setSalesManStockData([...arrWithOutDuplicates]);
                 setLoading(false);
             }
@@ -111,6 +113,18 @@ const Stock = ({ navigation, route }) => {
     useEffect(() => {
         setLoading(true);
         getStoreKeeperStock();
+    }, []);
+
+    function handleBackButtonClick() {
+        navigation.goBack();
+        return true;
+    }
+
+    useEffect(() => {
+        BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
+        return () => {
+            BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
+        };
     }, []);
 
     return (
@@ -163,9 +177,9 @@ export default Stock;
 
 const styles = StyleSheet.create({
     loadingContainer: {
-        flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        height: Dimensions.get('window').height,
     },
     container: {
         // flex: 1,

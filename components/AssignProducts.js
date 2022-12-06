@@ -16,12 +16,14 @@ import axios from "axios";
 import {
     productDetailAdminApi,
     salesManPlaceOrderApi,
-    viewCustomerApi,
+    assignedCutomerApi,
+    ViewAllCustomerApi,
 } from "../api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import UserContext from "../context/users/userContext";
 import { RadioButton } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
 
 
 const AssignProducts = ({ }) => {
@@ -34,8 +36,13 @@ const AssignProducts = ({ }) => {
     const [loadingSubmit, setLoadingSubmit] = useState(false);
     const [error, setError] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState([]);
-    const [status, setStatus] = useState('Order');
+    const [status, setStatus] = useState('order');
     const [productQuantityCollection, setProductQuantityCollection] = useState([])
+    const [location, setLocation] = useState({});
+    // console.log('customerName', customerName)
+
+
+    const isFocused = useIsFocused();
 
     const handleIdSelection = (id) => {
         setSelectedId(id);
@@ -75,46 +82,99 @@ const AssignProducts = ({ }) => {
         setProductQuantityCollection([...productQuantityCollection]);
     }
 
-    const handleRequestOrderSubmit = async () => {
-        if (!selectedId) {
-            alert("Please select Customer Name!");
-            setLoadingSubmit(false);
+    const getPermissionLocation = async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            alert('Permission to access location was denied');
+            navigation.navigate("Home");
             return;
         }
-        else if (!selectedProduct) {
-            alert("Select product name");
-            setLoadingSubmit(false);
-            return
+        let { coords } = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = coords;
+
+        setLocation({
+            latitude: latitude,
+            longitude: longitude
+        });
+    }
+
+    const handleRequestOrderSubmit = async () => {
+        // console.log(selectedProduct);
+        // console.log(productQuantityCollection);
+
+        if (!location.longitude || !location.latitude) {
+            getPermissionLocation();
+            return;
         }
 
-        else {
+        setLoadingSubmit(true)
+        if (status === "visit") {
             try {
                 await axios.post(salesManPlaceOrderApi, {
                     customer_id: selectedId,
                     visit_status: status.toLocaleLowerCase(),
-                    products: productQuantityCollection,
-                    longitude: "10.1000",
-                    latitude: "10.1000",
+                    products: [],
+                    longitude: location.longitude,
+                    latitude: location.latitude,
                     deliver_date: new Date(),
                     order_status: null,
                     details: "dummy details"
-                }, headers);
+                }, headers)
                 setLoadingSubmit(false);
-                alert("product successfully ordered");
-                navigation.navigate("Home");
-                console.log('productQuantityCollection', productQuantityCollection)
-
+                alert("Visit successfully!");
+                navigation.navigate("OrdersScreen");
             } catch (error) {
-                console.log(error);
+                console.log(error)
+                alert("Failed")
                 setLoadingSubmit(false);
             }
+
+        } else if (status === "order") {
+            if (selectedId === 0) {
+                alert("Please select customer name!");
+                setLoadingSubmit(false);
+                return;
+            } else if (!selectedProduct.length) {
+                alert("Select product name");
+                setLoadingSubmit(false)
+                return;
+            }
+            else if (selectedProduct.length !== productQuantityCollection.length) {
+                alert("Enter product quantity");
+                setLoadingSubmit(false);
+                return
+            }
+            else {
+                try {
+                    await axios.post(salesManPlaceOrderApi, {
+                        customer_id: selectedId,
+                        visit_status: status.toLocaleLowerCase(),
+                        products: productQuantityCollection,
+                        longitude: location.longitude,
+                        latitude: location.latitude,
+                        deliver_date: new Date(),
+                        order_status: null,
+                        details: "dummy details"
+                    }, headers);
+                    setLoadingSubmit(false);
+                    alert("product successfully ordered");
+                    navigation.navigate("Home");
+                    console.log('productQuantityCollection', productQuantityCollection)
+
+                } catch (error) {
+                    console.log(error);
+                    setLoadingSubmit(false);
+                }
+            }
         }
+
+
     };
 
     const getAllProduct = async () => {
         try {
-            const response = await axios.get(viewCustomerApi, headers);
-            response.data.data?.forEach((element, index) => {
+            const response = await axios.get(ViewAllCustomerApi, headers);
+            response.data.data?.reverse().forEach((element, index) => {
                 customerName[index] = {
                     key: element.id,
                     value: element.name,
@@ -140,10 +200,14 @@ const AssignProducts = ({ }) => {
         }
     };
 
+
     useEffect(() => {
-        setLoading(true);
-        getAllProduct();
-    }, []);
+        if (isFocused) {
+            getPermissionLocation()
+            setLoading(true);
+            getAllProduct();
+        };
+    }, [isFocused]);
 
     const selectedProductDeleteHandler = (id) => {
         const newArr1 = productQuantityCollection.filter(item => item.pId !== id);
@@ -182,9 +246,9 @@ const AssignProducts = ({ }) => {
                                     <View style={{ flexDirection: "row", marginLeft: 15 }}>
                                         <Text style={{ fontSize: 18, marginTop: 3 }}>Order</Text>
                                         <RadioButton
-                                            value="Order"
-                                            status={status === 'Order' ? 'checked' : 'unchecked'}
-                                            onPress={() => setStatus("Order")}
+                                            value="order"
+                                            status={status === 'order' ? 'checked' : 'unchecked'}
+                                            onPress={() => setStatus("order")}
                                         />
                                     </View>
                                     <View style={{ flexDirection: "row", marginLeft: 15 }}>
@@ -198,7 +262,7 @@ const AssignProducts = ({ }) => {
                                     </View>
                                 </View>
 
-                                {status === 'Order' ? <>
+                                {status === 'order' ? <>
                                     <View style={styles.dropdown_container}>
                                         <Text style={{ fontSize: 20, marginVertical: 10, fontWeight: "500" }}>
                                             Product Name

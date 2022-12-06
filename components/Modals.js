@@ -7,23 +7,27 @@ import ReasonModal from "./ReasonModal";
 import QuantityModal from "./QuantityModal";
 import UserContext from "../context/users/userContext";
 import axios from "axios";
-import { AcceptOrderRequest } from "../api";
+import { acceptOrderRequest } from "../api";
 
 const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
   const [changeQuantity, setChangeQuantity] = useState(false);
   const [reject, setReject] = useState(false);
   const [availableProduct, setAvailableProduct] = useState({});
+  const [acceptLoading, setAcceptLoading] = useState(false);
 
   const hideModal = () => setVisible(false);
   const user = useContext(UserContext);
 
   const onAccept = async (defaultQuantity = true, quantity) => {
-    const filteredProduct = storeKeeper.find(element => element.id === selectedOrder.products[0].id);
+    setAcceptLoading(true)
+    const filteredProduct = storeKeeper.find(element => element.product.id === selectedOrder.product_id);
+    console.log('filteredProduct :>> ', filteredProduct);
 
     const salesMenRequestQuantity = defaultQuantity ? selectedOrder.request_quantity : quantity;
 
-    if (!filteredProduct || salesMenRequestQuantity > filteredProduct.pivot.quantity) {
+    if (!filteredProduct || salesMenRequestQuantity > filteredProduct.quantity) {
       alert("Quantity not available");
+      setAcceptLoading(false)
       return;
     };
 
@@ -43,15 +47,16 @@ const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
     };
 
     try {
-      const response = await axios.post(`${AcceptOrderRequest}${selectedOrder.id}/request`, reqOptions, headers);
+      const response = await axios.post(`${acceptOrderRequest}${selectedOrder.id}/request`, reqOptions, headers);
       console.log(response);
       alert("Order Accepted");
       setVisible(false);
-
+      setAcceptLoading(false)
       navigation.navigate("Home")
 
     } catch (err) {
       console.log(err);
+      setAcceptLoading(false)
     };
   };
 
@@ -64,8 +69,10 @@ const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
   };
 
   useEffect(() => {
-    const filteredProduct = storeKeeper.find(element => element.id === selectedOrder.products[0].id);
 
+    const filteredProduct = storeKeeper.find(element => element.product.id === selectedOrder.product_id);
+
+    // console.log('filteredProduct :>> ', filteredProduct);
     setAvailableProduct(filteredProduct ? filteredProduct : {});
   }, []);
 
@@ -84,13 +91,13 @@ const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
               right: 28,
               fontSize: 12,
               color:
-                !availableProduct?.pivot?.quantity ? "red" :
-                  availableProduct?.pivot?.quantity < selectedOrder.request_quantity ? "red" : "grey",
+                !availableProduct?.quantity ? "red" :
+                  availableProduct?.quantity < selectedOrder.request_quantity ? "red" : "grey",
             }}
           >
             {
               reject ? null :
-                `Available Quantity : ${availableProduct?.pivot?.quantity ? availableProduct.pivot.quantity : " 0"}`
+                `Available Quantity : ${availableProduct?.quantity ? availableProduct.quantity : " 0"}`
             }
           </Text>
           {!reject && !changeQuantity && (
@@ -98,6 +105,7 @@ const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
               onAccept={onAccept}
               onReject={onReject}
               onChangeQuantity={onChangeQuantity}
+              acceptLoading={acceptLoading}
             />
           )}
           {reject && (
@@ -112,6 +120,7 @@ const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
             <QuantityModal
               onChangeQuantity={onChangeQuantity}
               onAccept={onAccept}
+              acceptLoading={acceptLoading}
             />
           )}
         </Modal>

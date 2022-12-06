@@ -5,10 +5,12 @@ import {
   Text,
   View,
   ActivityIndicator,
+  BackHandler,
 } from "react-native";
 import { OrdersApi } from "./api";
 import OrderTable from "./components/OrderTable";
 import { api } from "./api";
+import { useNavigation } from '@react-navigation/native';
 
 const PastOrders = ({ route }) => {
   const [loading, setLoading] = useState(false);
@@ -17,15 +19,15 @@ const PastOrders = ({ route }) => {
 
   const { _response } = api;
 
-  const getOrders = async () => {
-    const headers = {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    };
+  const headers = {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
+  const getOrders = async () => {
     try {
       const response = await axios.get(`${OrdersApi}?action=ar`, headers);
       const { data } = _response(response);
@@ -41,6 +43,20 @@ const PastOrders = ({ route }) => {
   useEffect(() => {
     setLoading(true);
     getOrders();
+  }, []);
+
+  const navigation = useNavigation();
+
+  function handleBackButtonClick() {
+    navigation.goBack();
+    return true;
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
+    };
   }, []);
 
   // const orders = [

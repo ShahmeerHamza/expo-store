@@ -6,13 +6,16 @@ import {
   Image,
   Text,
   TouchableOpacity,
+  BackHandler,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import CustomerCard from "./components/CustomerCard";
 import UserContext from "./context/users/userContext";
 import axios from "axios";
-import { salesManPlaceOrderApi, viewCustomerApi } from "./api";
+import { salesManPlaceOrderApi, assignedCutomerApi } from "./api";
 import { Popover } from "react-native-popper";
+import { useNavigation } from '@react-navigation/native';
+import { formatDistance } from "date-fns";
 
 
 const Customers = () => {
@@ -22,6 +25,8 @@ const Customers = () => {
   // console.log('customersData', customersData)
 
   const user = useContext(UserContext);
+
+  const navigation = useNavigation();
 
   const headers = {
     headers: {
@@ -33,7 +38,7 @@ const Customers = () => {
 
   const getAllCustomers = async () => {
     try {
-      const response = await axios.get(viewCustomerApi, headers);
+      const response = await axios.get(assignedCutomerApi, headers);
       // console.log('response--------------------', response);
       setCustomersData(response.data.data.reverse());
       setLoading(false);
@@ -50,21 +55,17 @@ const Customers = () => {
     getAllCustomers();
   }, []);
 
-  // const handleDeliver = async (user) => {
-  //   // console.log('user', user)
-  //   try {
-  //     const response = await axios.post(salesManPlaceOrderApi,)
+  function handleBackButtonClick() {
+    navigation.goBack();
+    return true;
+  }
 
-  //   } catch (error) {
-  //     console.log('error', error)
-  //   }
-  // }
-
-  // const handleVisit = (data) => {
-  //   // console.log('data.id', data.id)
-  // }
-
-
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
+    };
+  }, []);
   return (
     <>
       {loading ? (
@@ -131,11 +132,20 @@ const Customers = () => {
                               style={styles.dataTableCellImg}
                               source={require("./assets/user.png")}
                             />
-                            <View style={{ marginLeft: 10, marginTop: 8 }}>
-                              <Text style={styles.headerTxt}>{item.name}</Text>
+                            <View style={{ marginLeft: 10, marginTop: 8, }}>
+                              <View style={{ maxWidth: 190, flexDirection: "row", flexWrap: "wrap", alignItems: "center", }}>
+                                <Text style={styles.headerTxt}>
+                                  {item.name}{"  "}
+                                  {/* {formatDistance(new Date(item.created_at), new Date())} ago */}
+                                </Text>
+                                <Text style={{ color: "grey", fontSize: 11, textTransform: "capitalize" }}>
+                                  {formatDistance(new Date(item.created_at), new Date())} ago
+                                </Text>
+                              </View>
                               <Text style={styles.dataTableCellText}>
                                 {item.phone}
                               </Text>
+
                             </View>
                           </View>
 
@@ -144,7 +154,7 @@ const Customers = () => {
                             trigger={
                               <TouchableOpacity>
                                 <Image
-                                  style={{ height: 40, width: 42 }}
+                                  style={{ height: 40, width: 42, borderWidth: 1 }}
                                   source={require("./assets/map.png")}
                                 />
                               </TouchableOpacity>
@@ -165,7 +175,7 @@ const Customers = () => {
 
                 </View> :
                 <View style={styles.container}>
-                  <Text>No customers found</Text>
+                  <Text style={{ fontSize: 20 }}>No customers found</Text>
                 </View>
           }
         </>
@@ -179,10 +189,10 @@ export default Customers;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // backgroundColor: "#f8fff9",
-    // justifyContent: "center",
-    // alignItems: "center",
+    flex: 1,
+    backgroundColor: "#f8fff9",
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingHorizontal: 5,
   },
@@ -196,6 +206,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     letterSpacing: 0.5,
+    textTransform: "capitalize"
+    // borderWidth: 1
   },
   dataTable: {
     // alignItems: "center",

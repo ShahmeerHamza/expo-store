@@ -4,6 +4,7 @@ import {
   Text,
   View,
   ActivityIndicator,
+  BackHandler,
 } from "react-native";
 import OrderTable from "./components/OrderTable";
 import { api, OrdersApi, StoreKeeperStockApi } from "./api";
@@ -39,6 +40,7 @@ const CurrentOrders = ({ navigation, route }) => {
       const response = await axios.get(OrdersApi, headers);
       const { data } = _response(response);
       setCurrentOrdersData(data);
+      // console.log('data :>> ', data);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -49,21 +51,33 @@ const CurrentOrders = ({ navigation, route }) => {
   const getStoreKeeperStock = async () => {
     try {
       const response = await axios.get(
-        `${StoreKeeperStockApi}/${user.userState.id}`,
+        `${StoreKeeperStockApi}`,
         headers
       );
       const { data } = _response(response);
-      storeKeeper.setAssignedProducts(data.assigned_products);
-
+      storeKeeper.setAssignedProducts(data);
     } catch (error) {
       console.error(error);
     }
   };
+  // console.log('storeKeeper :>> ', storeKeeper);
 
   useEffect(() => {
     setLoading(true);
     getOrders();
     getStoreKeeperStock();
+  }, []);
+
+  function handleBackButtonClick() {
+    navigation.goBack();
+    return true;
+  }
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
+    };
   }, []);
 
   // const orders = [

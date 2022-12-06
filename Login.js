@@ -79,8 +79,6 @@ const Login = ({ navigation }) => {
         setIsUserNotFound(true);
         setLoading(false);
       }
-      // console.log('userData.email', email)
-      // console.log('userData.password', password)
     } catch (ex) {
       console.error(ex);
       setIsUserNotFound(true);
@@ -94,7 +92,6 @@ const Login = ({ navigation }) => {
 
   useEffect(() => {
     fadeIn();
-    // alert("checked")
   }, []);
 
 

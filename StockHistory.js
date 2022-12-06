@@ -2,7 +2,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import HistoryTable from './components/HistoryTable'
 import axios from 'axios'
-import { api, OrdersApi } from './api'
+import { api, myRequestStockHistory, OrdersApi } from './api'
 import UserContext from './context/users/userContext'
 
 const StockHistory = () => {
@@ -76,14 +76,11 @@ const StockHistory = () => {
         let arr = [];
 
         try {
-            const response1 = await axios.get(OrdersApi, headers);
-            const response1Data = _response(response1).data;
+            const response1 = await axios.get(myRequestStockHistory, headers);
+            // const response1Data = _response(response1).data;
+            console.log('response1 ============:>> ', response1?.data?.data);
 
-            const response2 = await axios.get(`${OrdersApi}?action=ar`, headers);
-            const response2Data = _response(response2).data;
-
-            arr = arr.concat(response1Data, response2Data);
-            setAllOrders(arr);
+            setAllOrders(response1?.data?.data);
             setLoading(false);
         } catch (ex) {
             console.log(ex);
@@ -94,12 +91,13 @@ const StockHistory = () => {
     useEffect(() => {
         getAllAcceptRejectPendingOrders();
     }, []);
+    console.log('allOrders', allOrders)
 
     return (
         <View>
             {
                 loading ?
-                    <View style={{ justifyContent: "center", alignItems: "center", height: "100%" }}><ActivityIndicator /></View> :
+                    <View style={{ justifyContent: "center", alignItems: "center", height: "100%" }}><ActivityIndicator size={35} /></View> :
                     <HistoryTable data={allOrders} />
             }
         </View>

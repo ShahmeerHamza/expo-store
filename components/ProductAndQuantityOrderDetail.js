@@ -13,17 +13,38 @@ import UserContext from "./../context/users/userContext";
 import { orderMarkDeliver, specificOrder } from "../api";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
+import { FontAwesome } from "@expo/vector-icons";
+// import { SelectList } from 'react-native-dropdown-select-list'
+// import DropDownPicker from 'react-native-dropdown-picker'
+import SelectList from "react-native-dropdown-select-list";
+import ProductDropdown from "./ProductDropdown";
+import { viewSalesManStock } from "./../api/index";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
+import * as Location from "expo-location";
+import getOrdersUpdateContext from "../context/GetOrdersUpdate/getOrdersUpdateContext";
 
 const ProductAndQuantityOrderDetail = ({ route }) => {
     const [orderCollection, setOrderCollection] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [salesManStockData, setSalesManStockData] = useState([]);
+    const [location, setLocation] = useState({});
+
+    const isFocused = useIsFocused();
+
     // const [deliverLoading, setDeliverLoading] = useState(false);
     const order_ID = route.params.state;
-    const putApi_ID = orderCollection.id;
+
+    const navigation = useNavigation();
+    // const putApi_ID = orderCollection.id;
     // console.log('putApi_ID', putApi_ID)
     // console.log("orderCollection", orderCollection);
 
     const user = useContext(UserContext);
+
+
+    // const handleProductSelection = () => {
+
+    // }
 
     const headers = {
         headers: {
@@ -41,66 +62,123 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
             );
             setLoading(false);
             // console.log('response', response.data.data.product_sale);
-            setOrderCollection(response.data.data.product_sale);
+            setOrderCollection(response?.data?.data?.product_sale);
         } catch (error) {
             console.log(error);
             setLoading(false);
         }
     };
 
-    const handleDeliver = async (id) => {
-        // setDeliverLoading(true)
-        // console.log("Product", id);
-        // const findProduct = orderCollection.product_sale.find(
-        //     (item) => item.id === id
-        // );
-        // console.log("checkProduct", findProduct);
+    const viewSalesmanStock = async () => {
+        try {
+            const response1 = await axios.get(viewSalesManStock, headers);
+            // const resData = _response(response1);
+            setSalesManStockData(response1.data.data);
+            // console.log('response1.data :>> ', response1.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-        // console.log(user.userState.token);
-        // try {
-        //     const res = await axios.put(
-        //         `${orderMarkDeliver}${id}/delivered`,
-        //         headers
-        //     );
+    const getPermissionLocation = async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+            alert("Permission to access location was denied");
+            navigation.navigate("Home");
+            return;
+        }
+        let { coords } = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = coords;
 
-        //     console.log(res);
-        //     alert("Product Delivered!");
-        // } catch (error) {
-        //     console.log(error);
-        // }
+        setLocation({
+            latitude: latitude,
+            longitude: longitude,
+        });
+    };
 
-        // PUT request using fetch()
-        fetch(`${orderMarkDeliver}${id}/delivered`, {
-            // Adding method type
-            method: "PUT",
+    // const UpdateOrdersData = useContext(getOrdersUpdateContext);
 
-            // Adding headers to the request
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-                Authorization: `Bearer ${user.userState.token}`,
-            },
-        })
-            // Converting to JSON
-            .then((response) => response.json())
 
-            // Displaying results to console
-            .then((json) => {
-                console.log(json);
-                // setDeliverLoading(false)
-                getOrderCollection();
+    const handleDeliver = async (id, prodId, qty) => {
+
+        const findSalesmanStockData = salesManStockData.find(
+            (item) => item.product.id === prodId
+        );
+        // console.log("findSalesmanStockData :>> ", findSalesmanStockData);
+
+        // const findOrderCollection = orderCollection.find(item => item.id === id);
+
+        if (qty > findSalesmanStockData?.quantity || !findSalesmanStockData) {
+            alert("Quantity not available");
+            return;
+        } else {
+            // await axios.put(`${orderMarkDeliver}${id}/delivered`, { status: "delivered" }, headers);
+
+            fetch(`${orderMarkDeliver}${id}/delivered`, {
+                // Adding method type
+                method: "PUT",
+                // Adding headers to the request
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Authorization: `Bearer ${user.userState.token}`,
+                },
+                // Adding body to the request
+                body: JSON.stringify({
+                    status: "delivered",
+                    longitude: location.longitude,
+                    latitude: location.latitude,
+                }),
             })
+                // Converting to JSON
+                .then((response) => response.json())
 
-            // Displaying error to console
-            .catch((ex) => {
-                console.error(ex);
-                // setDeliverLoading(false);
-            });
+                // Displaying results to console
+                .then((json) => {
+                    console.log(json);
+                    // setDeliverLoading(false)
+                    getOrderCollection();
+
+                    alert("Order Delivered");
+                    // UpdateOrdersData.setUpdateData(true)
+                })
+
+                // Displaying error to console
+                .catch((ex) => {
+                    console.error(ex);
+                    // setDeliverLoading(false);
+                });
+        }
+    };
+
+
+    const handleVisit = async (id) => {
+        try {
+            await axios.put(
+                `${orderMarkDeliver}${id}/delivered`,
+                {
+                    status: "visited",
+                    longitude: location.longitude,
+                    latitude: location.latitude,
+                },
+                headers
+            );
+            alert("Order Visited");
+            // UpdateOrdersData.setUpdateData(true)
+            getOrderCollection()
+            // navigation.navigate("Home")
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     useEffect(() => {
-        setLoading(true);
-        getOrderCollection();
+        if (isFocused) {
+            getPermissionLocation()
+            setLoading(true);
+            getOrderCollection();
+            viewSalesmanStock();
+        }
     }, []);
     return (
         <>
@@ -119,8 +197,9 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
                                     fontSize: 16,
                                 }}
                                 style={{
-                                    flex: 1.2,
+                                    flex: 1.5,
                                     justifyContent: "flex-start",
+
                                     // marginLeft: -9,
                                 }}
                             >
@@ -133,9 +212,10 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
                                     fontSize: 16,
                                 }}
                                 style={{
-                                    flex: 0.5,
+                                    flex: 0.4,
                                     justifyContent: "center",
-                                    justifyContent: "center",
+
+                                    marginLeft: 10,
                                 }}
                             >
                                 Qty
@@ -146,7 +226,7 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
                                     color: "black",
                                     fontSize: 16,
                                 }}
-                                style={{ flex: 0.8, justifyContent: "center" }}
+                                style={{ flex: 0.8, justifyContent: "center", marginLeft: 15 }}
                             >
                                 Status
                             </DataTable.Title>
@@ -157,17 +237,17 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
                                 }}
                                 style={{ flex: 0.8, justifyContent: "flex-end" }}
                             >
-                                Action
+                                Deliver
                             </DataTable.Title>
-                            {/* <DataTable.Title
-                        textStyle={{
-                            color: "black",
-                            fontSize: 16,
-                        }}
-                        style={{ flex: 0.5, justifyContent: "center", marginRight: -9 }}
-                    >
-                        Visit
-                    </DataTable.Title> */}
+                            <DataTable.Title
+                                textStyle={{
+                                    color: "black",
+                                    fontSize: 16,
+                                }}
+                                style={{ flex: 0.5, justifyContent: "center", marginRight: -9 }}
+                            >
+                                Visit
+                            </DataTable.Title>
                         </DataTable.Header>
 
                         <FlatList
@@ -177,25 +257,21 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
                                 <DataTable.Row>
                                     <DataTable.Cell
                                         textStyle={{
-                                            color:
-                                                item.status === "pending" ? "black" : "#009387",
+                                            color: item.status !== "delivered" ? "black" : "#009387",
                                             fontSize: 16,
-                                            textTransform: "capitalize"
+                                            textTransform: "capitalize",
                                         }}
                                         style={{
                                             flex: 1.2,
                                             justifyContent: "flex-start",
                                             // marginLeft: -3,
-                                            justifyContent: "flex-start",
-
                                         }}
                                     >
                                         {item.product.name}
                                     </DataTable.Cell>
                                     <DataTable.Cell
                                         textStyle={{
-                                            color:
-                                                item.status === "pending" ? "black" : "#009387",
+                                            color: item.status !== "delivered" ? "black" : "#009387",
                                             fontSize: 16,
                                         }}
                                         style={{ flex: 0.5, justifyContent: "center" }}
@@ -204,7 +280,7 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
                                     </DataTable.Cell>
                                     <DataTable.Cell
                                         textStyle={{
-                                            color: item.status === "pending" ? "black" : "#009387",
+                                            color: item.status !== "delivered" ? "black" : "#009387",
                                             fontSize: 16,
                                         }}
                                         style={{
@@ -218,10 +294,18 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
                                     <DataTable.Cell
                                         style={{ flex: 0.6, justifyContent: "flex-end" }}
                                     >
-                                        {item.status === "pending" ? (
+                                        {/* <TouchableOpacity onPress={() => (<View>
+                                            <TouchableOpacity><Text>Deliver</Text></TouchableOpacity>
+                                            <TouchableOpacity><Text>Visit</Text></TouchableOpacity>
+                                        </View>)}>
+                                            <FontAwesome name="chevron-down" size={12} color={'black'} />
+                                        </TouchableOpacity> */}
+                                        {item.status !== "delivered" ? (
                                             <TouchableOpacity
                                                 style={{ borderRadius: 30 / 2, overflow: "hidden" }}
-                                                onPress={() => handleDeliver(item.id)}
+                                                onPress={() =>
+                                                    handleDeliver(item.id, item.product.id, item.quantity)
+                                                }
                                             >
                                                 <Image
                                                     style={styles.imgIcon}
@@ -232,18 +316,31 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
                                             <Ionicons name="md-checkmark" size={30} color="#009387" />
                                         )}
                                     </DataTable.Cell>
-                                    {/* <DataTable.Cell
-                                style={{ flex: 0.5, justifyContent: "center", marginRight: -9 }}
-                            >
-                                <TouchableOpacity
-                                    style={{ borderRadius: 30 / 2, overflow: "hidden" }}
-                                >
-                                    <Image
-                                        style={styles.imgIcon}
-                                        source={require("../assets/4052241.png")}
-                                    />
-                                </TouchableOpacity>
-                            </DataTable.Cell> */}
+                                    <DataTable.Cell
+                                        style={{
+                                            flex: 0.5,
+                                            justifyContent: "center",
+                                            marginRight: -9,
+                                        }}
+                                    >
+                                        {item.status === "delivered" ? null : (
+                                            <>
+                                                {item.status !== "visited" ? (
+                                                    <TouchableOpacity
+                                                        onPress={() => handleVisit(item.id)}
+                                                        style={{ borderRadius: 30 / 2, overflow: "hidden" }}
+                                                    >
+                                                        <Image
+                                                            style={styles.imgIcon}
+                                                            source={require("../assets/4052241.png")}
+                                                        />
+                                                    </TouchableOpacity>
+                                                ) : (
+                                                    <Text style={{ color: "#009387" }}>visited</Text>
+                                                )}
+                                            </>
+                                        )}
+                                    </DataTable.Cell>
                                 </DataTable.Row>
                             )}
                         />

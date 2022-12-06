@@ -1,11 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 const SelectionModal = ({
   onAccept,
   onReject,
   onChangeQuantity,
+  acceptLoading
 }) => {
   return (
     <View style={styles.container}>
@@ -21,7 +22,7 @@ const SelectionModal = ({
           onPress={onAccept}
         >
           <View style={styles.button}>
-            <Text style={styles.textSign}>Accept</Text>
+            <Text style={styles.textSign}>{acceptLoading ? <ActivityIndicator /> : "Accept"}</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.touchable} onPress={onReject}>

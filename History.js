@@ -1,7 +1,13 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import { BackHandler, Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import HistoryTable from './components/HistoryTable'
 import CustomerHistoryCard from './components/CustomerHistoryCard'
+import { useNavigation } from '@react-navigation/native';
+import { myHistory } from './api';
+import UserContext from './context/users/userContext';
+import axios from 'axios';
+import { formatDistance } from "date-fns";
+
 
 const History = () => {
     const [filterBtnStyleDeliver, setFilterBtnTextStyleDeliver] = useState({
@@ -12,6 +18,12 @@ const History = () => {
         color: "#009387",
         backgroundColor: "transparent",
     })
+    const [historyData, setHistoryData] = useState([]);
+    const [visitedData, setVisitedData] = useState([]);
+    const [deliveredData, setDeliveredData] = useState([]);
+    const [showDeliverData, setShowDeliverDAta] = useState(true);
+    // const [showVisitedData, setVisitedData] = (false)
+    // const visible
 
     const customers = [
         {
@@ -102,6 +114,8 @@ const History = () => {
     ];
 
     const changeDeliverStyle = () => {
+        // setVisitedData(false)
+        setShowDeliverDAta(true)
         setFilterBtnTextStyleDeliver({
             backgroundColor:
                 filterBtnStyleDeliver.backgroundColor === "#009387" ? "transparent" : "#009387",
@@ -118,6 +132,8 @@ const History = () => {
     };
 
     const changeVisitStyle = () => {
+        setShowDeliverDAta(false)
+        // setVisitedData(true)
         setFilterBtnTextStyleVisit({
             backgroundColor:
                 filterBtnStyleVisit.backgroundColor === "#009387" ? "transparent" : "#009387",
@@ -133,8 +149,49 @@ const History = () => {
         });
     };
 
+    const navigation = useNavigation();
+
+    function handleBackButtonClick() {
+        navigation.goBack();
+        return true;
+    }
+
+    const user = useContext(UserContext);
+
+    const headers = {
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${user.userState.token}`,
+        },
+    };
+
+    const getSalesmanHistoryData = async () => {
+        try {
+            const response = await axios.get(myHistory, headers);
+            // console.log('response', response?.data.data.completed_orders)
+            setDeliveredData(response.data.data.completed_orders.reverse());
+            setVisitedData(response?.data?.data?.visited.reverse());
+            // console.log('visitedData :>> ', deliveredData);
+
+
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+    useEffect(() => {
+        getSalesmanHistoryData()
+        BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
+        return () => {
+            BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
+        };
+    }, []);
+
     return (
-        <View style={{padding: 15}}>
+        <View style={{ padding: 15 }}>
             <View style={styles.filiterBtnContainer}>
                 <TouchableOpacity onPress={changeDeliverStyle} style={[styles.filterBtn, { backgroundColor: filterBtnStyleDeliver.backgroundColor }]}>
                     <Text style={{ color: filterBtnStyleDeliver.color }}>Delivered</Text>
@@ -144,12 +201,66 @@ const History = () => {
                 </TouchableOpacity>
             </View>
 
-            <View style={{height: 25}} />
+            <View style={{ height: 25 }} />
 
             <FlatList
-                data={customers}
+                data={showDeliverData ? deliveredData : visitedData}
                 showsVerticalScrollIndicator={false}
-                renderItem={({ item }) => <CustomerHistoryCard customer={item} />}
+                renderItem={({ item }) => (
+                    // <CustomerHistoryCard customer={item} />
+
+                    <TouchableOpacity
+                        style={styles.container}
+                        onPress={() =>
+                            navigation.navigate("Historydetail", { state: item })
+                        }
+                    >
+                        <View style={styles.card_container}>
+                            <View style={styles.card_text}>
+                                <Text style={{ fontSize: 18, fontWeight: "500" }}>Customer Name</Text>
+                                {/* <Text style={{ position: "absolute", right: 10, top: 5 }}>{format(new Date(order_Data.created_at) - new Date(), "H:m")}</Text> */}
+                                <Text style={{ position: "absolute", right: 10, top: 5, color: "#009387", fontSize: 11 }}>
+                                    {formatDistance(new Date(item.created_at), new Date())}
+                                </Text>
+                                <Text
+                                    style={{
+                                        fontSize: 17,
+                                        marginBottom: 0,
+                                        fontWeight: "500",
+                                        marginLeft: 22,
+                                        color: "#009387",
+                                        textTransform: "capitalize",
+                                    }}
+                                >
+                                    {item.customer.name}
+                                </Text>
+                                <Text style={{ fontSize: 18, fontWeight: "500" }}>Details</Text>
+                                <View style={{ flexDirection: "row", marginTop: 2, marginLeft: 22 }}>
+                                    <Image
+                                        style={{ width: 16, height: 16 }}
+                                        source={require("./assets/pin.png")}
+                                    />
+
+                                    <Text style={{ marginTop: -3, paddingLeft: 5, textTransform: "capitalize", }}>
+                                        {item.customer.address}
+                                    </Text>
+                                </View>
+
+                                <View style={{ flexDirection: "row", marginTop: 2, marginLeft: 22 }}>
+                                    <Image
+                                        style={{ width: 16, height: 16 }}
+                                        source={require("./assets/contact-mail.png")}
+                                    />
+
+                                    <Text style={{ marginTop: -3, paddingLeft: 5 }}>
+                                        {item.customer.phone}
+                                    </Text>
+                                </View>
+
+                            </View>
+                        </View>
+                    </TouchableOpacity>
+                )}
             />
         </View>
     )
@@ -170,5 +281,47 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 8
-    }
+    },
+    container: {
+        backgroundColor: "#fff",
+        marginVertical: 15,
+        borderColor: "lightgrey",
+        borderRadius: 20,
+        borderWidth: 1,
+        width: Dimensions.get("window").width * 0.9,
+    },
+
+    card_container: {
+        // flex: 1,
+        padding: 20,
+        flexDirection: "row",
+    },
+
+    card_text: {
+        flex: 2,
+    },
+
+    card_buttons: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    button: {
+        width: "90%",
+        borderRadius: 10,
+    },
+
+    linear_button: {
+        width: "100%",
+        height: 40,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 10,
+        margin: 10,
+    },
+
+    button_text: {
+        color: "#fff",
+    },
 })

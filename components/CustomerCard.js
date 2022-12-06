@@ -14,6 +14,10 @@ const CustomerCard = ({
   navigation,
 }) => {
 
+  // console.log('====================================');
+  // console.log(order_Data);
+  // console.log('====================================');
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -26,7 +30,7 @@ const CustomerCard = ({
           <Text style={{ fontSize: 18, fontWeight: "500" }}>Customer Name</Text>
           {/* <Text style={{ position: "absolute", right: 10, top: 5 }}>{format(new Date(order_Data.created_at) - new Date(), "H:m")}</Text> */}
           <Text style={{ position: "absolute", right: 10, top: 5, color: "#009387", fontSize: 11 }}>
-            {formatDistance(new Date(order_Data.created_at), new Date())}
+            {formatDistance(new Date(order_Data.created_at), new Date())} ago
           </Text>
           <Text
             style={{
@@ -35,6 +39,7 @@ const CustomerCard = ({
               fontWeight: "500",
               marginLeft: 22,
               color: "#009387",
+              textTransform: "capitalize",
             }}
           >
             {order_Data.customer.name}
@@ -46,7 +51,7 @@ const CustomerCard = ({
               source={require("../assets/pin.png")}
             />
 
-            <Text style={{ marginTop: -3, paddingLeft: 5 }}>
+            <Text style={{ marginTop: -3, paddingLeft: 5, textTransform: "capitalize" }}>
               {order_Data.customer.address}
             </Text>
           </View>

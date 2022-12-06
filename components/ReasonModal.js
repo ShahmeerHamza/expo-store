@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from 'axios';
-import { AcceptOrderRequest } from './../api/index';
+import { acceptOrderRequest } from './../api/index';
 import UserContext from "../context/users/userContext";
 
 const ReasonModal = ({ onReject, selectedOrder, navigation }) => {
@@ -39,7 +39,7 @@ const ReasonModal = ({ onReject, selectedOrder, navigation }) => {
 
     try {
       // alert("working")
-      const response = await axios.post(`${AcceptOrderRequest}${selectedOrder.id}/request`, reqOptions, headers);
+      const response = await axios.post(`${acceptOrderRequest}${selectedOrder.id}/request`, reqOptions, headers);
       console.log(response);
 
       alert("Product Rejected!");

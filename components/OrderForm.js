@@ -65,7 +65,7 @@ const OrderForm = ({ navigation }) => {
                     headers
                 );
                 setLoadingSubmit(false);
-                alert("product successfully ordered");
+                alert("product successfully requested");
                 navigation.navigate("Home");
             } catch (error) {
                 console.log(error);

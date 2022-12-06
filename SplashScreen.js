@@ -7,6 +7,7 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  BackHandler,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -29,6 +30,18 @@ const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     fadeIn();
   }, []);
+
+  // function handleBackButtonClick() {
+  //   navigation.goBack();
+  //   return true;
+  // }
+
+  // useEffect(() => {
+  //   BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
+  //   return () => {
+  //     BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
+  //   };
+  // }, []);
 
   return (
     <View style={styles.container}>

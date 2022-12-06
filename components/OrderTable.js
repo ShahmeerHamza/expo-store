@@ -10,6 +10,7 @@ const OrderTable = ({ modal, data, heading, screen, navigation, storeKeeper }) =
     const [visible1, setVisible1] = useState(false);
     const [pastOrder, setPastOrders] = useState({});
     const [selectedCurrentOrders, setSelectedCurrentOrders] = useState({});
+    // console.log('selectedCurrentOrders :>> ', selectedCurrentOrders);
     return (
         <>
 
@@ -73,10 +74,10 @@ const OrderTable = ({ modal, data, heading, screen, navigation, storeKeeper }) =
                                 >
                                     {screen === "currentOrders" ? format(new Date(item.created_at), "dd-MMM-yy") : format(new Date(item.updated_at), "dd-MMM-yy")}
                                 </DataTable.Cell>
-                                <DataTable.Cell style={{ flex: 2.5 }}>
+                                <DataTable.Cell textStyle={{ textTransform: "capitalize" }} style={{ flex: 2.5 }}>
                                     {item.salesman.name}
                                 </DataTable.Cell>
-                                <DataTable.Cell style={{ flex: 3 }}>
+                                <DataTable.Cell textStyle={{ textTransform: "capitalize" }} style={{ flex: 3 }}>
                                     {item.products[0].name}
                                 </DataTable.Cell>
                                 <DataTable.Cell style={{ flex: 1, justifyContent: "flex-end" }}>

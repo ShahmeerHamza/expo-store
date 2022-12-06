@@ -5,10 +5,11 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-const QuantityModal = ({ onChangeQuantity, onAccept }) => {
+const QuantityModal = ({ onChangeQuantity, onAccept, acceptLoading }) => {
   const [changeQuantityInput, setChangeQuantityInput] = useState(0);
   // console.log('changeQuantityInput------------------------->', changeQuantityInput)
 
@@ -25,7 +26,7 @@ const QuantityModal = ({ onChangeQuantity, onAccept }) => {
             style={styles.linear_button}
             colors={["#08d4c4", "#01ab9d"]}
           >
-            <Text style={styles.textLinear}>Confirm Quantity & Accept</Text>
+            <Text style={styles.textLinear}>{acceptLoading ? <ActivityIndicator /> : "Confirm Quantity & Accept"}</Text>
           </LinearGradient>
         </TouchableOpacity>
         <TouchableOpacity
