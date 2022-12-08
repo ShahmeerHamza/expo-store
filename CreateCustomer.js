@@ -1,6 +1,7 @@
 import {
     ActivityIndicator,
     BackHandler,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -19,6 +20,10 @@ export default function CreateCustomer({ navigation }) {
     const [name, setName] = useState("");
     const [address, setAddress] = useState("");
     const [number, setNumber] = useState(0);
+    const [contactPerson, setContactPerson] = useState("");
+    const [landLine, setLandLine] = useState(0);
+    const [city, setCity] = useState("");
+    const [area, setArea] = useState("");
     const [loading, setLoading] = useState(false);
     const [screenLoading, setScreenLoading] = useState(false);
 
@@ -40,13 +45,33 @@ export default function CreateCustomer({ navigation }) {
             setScreenLoading(false);
             setLoading(false);
             return;
-        } else if (number === null) {
-            alert("Please enter number");
+        } else if (address === "") {
+            alert("Please enter address");
             setScreenLoading(false);
             setLoading(false);
             return;
-        } else if (address === "") {
-            alert("Please enter address");
+        } else if (number === 0) {
+            alert("Please enter phone number");
+            setScreenLoading(false);
+            setLoading(false);
+            return;
+        } else if (contactPerson === "") {
+            alert("Please enter contact person");
+            setScreenLoading(false);
+            setLoading(false);
+            return;
+        } else if (landLine === 0) {
+            alert("Please enter landline number");
+            setScreenLoading(false);
+            setLoading(false);
+            return;
+        } else if (city === "") {
+            alert("Please enter City name");
+            setScreenLoading(false);
+            setLoading(false);
+            return;
+        } else if (area === "") {
+            alert("Please enter Area address");
             setScreenLoading(false);
             setLoading(false);
             return;
@@ -55,6 +80,10 @@ export default function CreateCustomer({ navigation }) {
                 name: name,
                 phone: number,
                 address: address,
+                contactPerson: contactPerson,
+                landLine: landLine,
+                city: city,
+                area: area,
             };
             try {
                 const response = await axios.post(
@@ -66,6 +95,10 @@ export default function CreateCustomer({ navigation }) {
                 setName("");
                 setAddress("");
                 setNumber(0);
+                setContactPerson("");
+                setLandLine(0);
+                setCity("");
+                setArea("");
                 setScreenLoading(false);
                 setLoading(false);
                 navigation.navigate("Home");
@@ -105,25 +138,52 @@ export default function CreateCustomer({ navigation }) {
                 </View>
             ) : (
                 <>
-                    <TextInput
-                        placeholder="Name"
-                        style={styles.textInput}
-                        autoCapitalize="none"
-                        onChangeText={(text) => setName(text)}
-                    />
-                    <TextInput
-                        placeholder="Address"
-                        style={styles.textInput}
-                        autoCapitalize="none"
-                        onChangeText={(text) => setAddress(text)}
-                    />
-                    <TextInput
-                        placeholder="Phone Number"
-                        keyboardType="numeric"
-                        style={styles.textInput}
-                        autoCapitalize="none"
-                        onChangeText={(text) => setNumber(text)}
-                    />
+                    <ScrollView>
+                        <TextInput
+                            placeholder="Name"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(text) => setName(text)}
+                        />
+                        <TextInput
+                            placeholder="Address"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(text) => setAddress(text)}
+                        />
+                        <TextInput
+                            placeholder="Phone Number"
+                            keyboardType="numeric"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(text) => setNumber(text)}
+                        />
+                        <TextInput
+                            placeholder="Contact person"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(text) => setContactPerson(text)}
+                        />
+                        <TextInput
+                            placeholder="Land line"
+                            keyboardType="numeric"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(text) => setLandLine(text)}
+                        />
+                        <TextInput
+                            placeholder="City"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(text) => setCity(text)}
+                        />
+                        <TextInput
+                            placeholder="Area"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(text) => setArea(text)}
+                        />
+                    </ScrollView>
                     {/* <>
                             <Text style={{ fontSize: 17, color: "grey", marginVertical: 20, marginLeft: 5, fontWeight: '300', marginTop: 28 }}>
                                 Product Name
