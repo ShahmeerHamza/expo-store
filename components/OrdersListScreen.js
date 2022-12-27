@@ -81,7 +81,7 @@ const OrdersListScreen = ({ navigation }) => {
                             data={ordersData}
                             keyExtractor={(data) => data.id}
                             showsVerticalScrollIndicator={false}
-                            renderItem={({ item }) => <CustomerCard order_Data={item} navigation={navigation} />}
+                            renderItem={({ item }) => <CustomerCard order_Data={item} navigation={navigation} screen="customerOrders" />}
                         /> :
                         <>
                             <View style={styles.container2}>

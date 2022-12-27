@@ -5,13 +5,15 @@ import {
   View,
   ActivityIndicator,
   BackHandler,
+  FlatList
 } from "react-native";
-import OrderTable from "./components/OrderTable";
+import StoreKeeperOrderTable from "./components/StoreKeeperOrderTable";
 import { api, OrdersApi, StoreKeeperStockApi } from "./api";
 import axios from "axios";
 import { useContext } from "react";
 import UserContext from "./context/users/userContext";
 import StoreKeeperContext from "./context/storeKeeper/storeKeeperContext";
+import CustomerCard from "./components/CustomerCard";
 
 const CurrentOrders = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
@@ -35,7 +37,6 @@ const CurrentOrders = ({ navigation, route }) => {
   };
 
   const getOrders = async () => {
-
     try {
       const response = await axios.get(OrdersApi, headers);
       const { data } = _response(response);
@@ -50,10 +51,7 @@ const CurrentOrders = ({ navigation, route }) => {
 
   const getStoreKeeperStock = async () => {
     try {
-      const response = await axios.get(
-        `${StoreKeeperStockApi}`,
-        headers
-      );
+      const response = await axios.get(`${StoreKeeperStockApi}`, headers);
       const { data } = _response(response);
       storeKeeper.setAssignedProducts(data);
     } catch (error) {
@@ -76,7 +74,10 @@ const CurrentOrders = ({ navigation, route }) => {
   useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
     return () => {
-      BackHandler.removeEventListener("hardwareBackPress", handleBackButtonClick);
+      BackHandler.removeEventListener(
+        "hardwareBackPress",
+        handleBackButtonClick
+      );
     };
   }, []);
 
@@ -131,21 +132,35 @@ const CurrentOrders = ({ navigation, route }) => {
         </View>
       ) : (
         <>
-          {
-            currentOrdersData?.length ?
-              <View style={styles.container}>
-                <OrderTable
+          {currentOrdersData?.length ? (
+            <View style={styles.container}>
+              {/* <OrderTable
                   storeKeeper={storeKeeper.assignedProducts}
                   modal={showModal}
                   navigation={navigation}
                   data={currentOrdersData}
                   screen="currentOrders"
-                />
-              </View> :
-              <View style={[styles.container, { justifyContent: "center" }]}>
-                <Text style={{ fontSize: 20 }}>No orders available</Text>
-              </View>
-          }
+                /> */}
+              <FlatList
+                data={currentOrdersData}
+                keyExtractor={(data) => data.id}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item }) => {
+                  return <CustomerCard
+                    storeKeeperGetREquestOrder={item}
+                    navigation={navigation}
+                    modal={showModal}
+                    screen="currentOrders"
+                    storeKeeper={storeKeeper.assignedProducts}
+                  />
+                }}
+              />
+            </View>
+          ) : (
+            <View style={[styles.container, { justifyContent: "center" }]}>
+              <Text style={{ fontSize: 20 }}>No orders available</Text>
+            </View>
+          )}
         </>
       )}
     </>

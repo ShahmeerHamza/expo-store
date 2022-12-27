@@ -14,7 +14,7 @@ const CustomerHistoryCard = ({ route }) => {
   //   const { name, address, contact, productName, quantity } = customer;
 
   const historyData = route.params.state
-  console.log('historyData :>> ', historyData);
+  // console.log('historyData :>> ', historyData);
 
   return (
     <View style={styles.container1}>
@@ -65,46 +65,49 @@ const CustomerHistoryCard = ({ route }) => {
         <FlatList
           data={historyData.product_sale}
           keyExtractor={(data) => data.id}
-          renderItem={({ item }) => (
-            <DataTable.Row>
-              <DataTable.Cell
-                textStyle={{
-                  color: item.status !== "delivered" ? "black" : "#009387",
-                  fontSize: 16,
-                  textTransform: "capitalize",
-                }}
-                style={{
-                  flex: 1.5,
-                  justifyContent: "flex-start",
-                  // marginLeft: -3,
-                }}
-              >
-                {item.product_id}
-              </DataTable.Cell>
-              <DataTable.Cell
-                textStyle={{
-                  color: item.status !== "delivered" ? "black" : "#009387",
-                  fontSize: 16,
-                }}
-                style={{ flex: 1, justifyContent: "center", marginRight: 10 }}
-              >
-                {item.quantity}
-              </DataTable.Cell>
-              <DataTable.Cell
-                textStyle={{
-                  color: item.status !== "delivered" ? "black" : "#009387",
-                  fontSize: 16,
-                }}
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  color: "#009387",
-                }}
-              >
-                {item.status}
-              </DataTable.Cell>
-            </DataTable.Row>
-          )}
+          renderItem={({ item }) => {
+            // console.log('item :>> ', item);
+            return (
+              <DataTable.Row>
+                <DataTable.Cell
+                  textStyle={{
+                    color: item.status !== "delivered" ? "black" : "#009387",
+                    fontSize: 16,
+                    textTransform: "capitalize",
+                  }}
+                  style={{
+                    flex: 1.5,
+                    justifyContent: "flex-start",
+                    // marginLeft: -3,
+                  }}
+                >
+                  {item.product_id}
+                </DataTable.Cell>
+                <DataTable.Cell
+                  textStyle={{
+                    color: item.status !== "delivered" ? "black" : "#009387",
+                    fontSize: 16,
+                  }}
+                  style={{ flex: 1, justifyContent: "center", marginRight: 10 }}
+                >
+                  {item.quantity}
+                </DataTable.Cell>
+                <DataTable.Cell
+                  textStyle={{
+                    color: item.status !== "delivered" ? "black" : "#009387",
+                    fontSize: 16,
+                  }}
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    color: "#009387",
+                  }}
+                >
+                  {item.status}
+                </DataTable.Cell>
+              </DataTable.Row>
+            )
+          }}
         />
       </DataTable>
     </View>

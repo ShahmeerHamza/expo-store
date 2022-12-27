@@ -33,6 +33,7 @@ const ProductAndQuantityOrderDetail = ({ route }) => {
 
     // const [deliverLoading, setDeliverLoading] = useState(false);
     const order_ID = route.params.state;
+    console.log('order_ID :>> ', order_ID);
 
     const navigation = useNavigation();
     // const putApi_ID = orderCollection.id;

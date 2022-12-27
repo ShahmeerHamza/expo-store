@@ -21,6 +21,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import OrdersListScreen from './components/OrdersListScreen';
 import ProductAndQuantityOrderDetail from "./components/ProductAndQuantityOrderDetail";
 import CustomerHistoryCard from './components/CustomerHistoryCard';
+import StoreKeeperOrderTable from './components/StoreKeeperOrderTable';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -74,6 +75,14 @@ export default function App() {
               }}
               name="CurrentOrders"
               component={CurrentOrders}
+
+            />
+            <Stack.Screen
+              options={{
+                title: "Current Orders details",
+              }}
+              name="StoreKeeperOrderTable"
+              component={StoreKeeperOrderTable}
 
             />
 

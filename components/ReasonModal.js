@@ -34,12 +34,19 @@ const ReasonModal = ({ onReject, selectedOrder, navigation }) => {
       quantity_accepted: 0,
       status: "rejected",
       notes: reasonInput,
-      location: "karachi"
+      product_id: selectedOrder.pivot.product_id
     };
+    //   {
+    //     "quantity_accepted" : 2,
+    //     "status" :"accepted",
+    //     "notes"  : "deny",
+    //     "product_id" : 32
+
+    // }
 
     try {
       // alert("working")
-      const response = await axios.post(`${acceptOrderRequest}${selectedOrder.id}/request`, reqOptions, headers);
+      const response = await axios.post(`${acceptOrderRequest}${selectedOrder.pivot.order_request_id}/request`, reqOptions, headers);
       console.log(response);
 
       alert("Product Rejected!");

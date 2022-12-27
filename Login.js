@@ -116,8 +116,8 @@ const Login = ({ navigation }) => {
           <AppForm
             validationSchema={validationSchema}
             initialValues={{
-              email: "",
-              password: "",
+              email: "store2@store.com",
+              password: "testing123",
               device_name: "mobile",
             }}
             onSubmit={(values, { resetForm }) => handleLogin(values, resetForm)}
@@ -156,7 +156,7 @@ const Login = ({ navigation }) => {
 
             <ErrorMessages
               style={{ marginTop: 10, marginLeft: 5 }}
-              error={"Sword. Please try again."}
+              error={"Incorrect email or password. Please try again."}
               visible={isUserNotFound}
             />
 

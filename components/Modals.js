@@ -10,6 +10,8 @@ import axios from "axios";
 import { acceptOrderRequest } from "../api";
 
 const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
+  console.log('selectedOrder :>> ', selectedOrder);
+  console.log('storeKeeper :>> ', storeKeeper);
   const [changeQuantity, setChangeQuantity] = useState(false);
   const [reject, setReject] = useState(false);
   const [availableProduct, setAvailableProduct] = useState({});
@@ -19,11 +21,12 @@ const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
   const user = useContext(UserContext);
 
   const onAccept = async (defaultQuantity = true, quantity) => {
+    // console.log('quantity :>> ', quantity);
+    console.log('defaultQuantity :>> ', defaultQuantity);
     setAcceptLoading(true)
-    const filteredProduct = storeKeeper.find(element => element.product.id === selectedOrder.product_id);
-    console.log('filteredProduct :>> ', filteredProduct);
+    const filteredProduct = storeKeeper.find(element => element.product_id === selectedOrder.pivot.product_id);
 
-    const salesMenRequestQuantity = defaultQuantity ? selectedOrder.request_quantity : quantity;
+    const salesMenRequestQuantity = defaultQuantity ? selectedOrder.pivot.request_quantity : quantity;
 
     if (!filteredProduct || salesMenRequestQuantity > filteredProduct.quantity) {
       alert("Quantity not available");
@@ -42,12 +45,21 @@ const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
     const reqOptions = {
       quantity_accepted: salesMenRequestQuantity,
       status: "accepted",
-      notes: "",
-      location: "karachi"
+      notes: "deny",
+      product_id: selectedOrder.pivot.product_id
     };
+    //   {
+    //     "quantity_accepted" : 2,
+    //     "status" :"accepted",
+    //     "notes"  : "deny",
+    //     "product_id" : 32
+
+    // }
+
+    console.log('selectedOrder.id :>> ', selectedOrder.id);
 
     try {
-      const response = await axios.post(`${acceptOrderRequest}${selectedOrder.id}/request`, reqOptions, headers);
+      const response = await axios.post(`${acceptOrderRequest}${selectedOrder.pivot.order_request_id}/request`, reqOptions, headers);
       console.log(response);
       alert("Order Accepted");
       setVisible(false);
@@ -70,9 +82,8 @@ const Modals = ({ setVisible, selectedOrder, navigation, storeKeeper }) => {
 
   useEffect(() => {
 
-    const filteredProduct = storeKeeper.find(element => element.product.id === selectedOrder.product_id);
-
-    // console.log('filteredProduct :>> ', filteredProduct);
+    const filteredProduct = storeKeeper.find(element => element.product_id === selectedOrder.pivot.product_id);
+    console.log('filteredProduct :>> ', filteredProduct);
     setAvailableProduct(filteredProduct ? filteredProduct : {});
   }, []);
 

@@ -7,30 +7,63 @@ import {
   Image,
 } from "react-native";
 import React from "react";
-import { formatDistance } from "date-fns";
+import { formatDistance, format } from "date-fns";
+// import { format } from "date-fns";
 
 const CustomerCard = ({
   order_Data,
   navigation,
+  storeKeeperGetREquestOrder,
+  modal,
+  screen,
+  storeKeeper,
+  pastOrderAccepted,
 }) => {
-
   // console.log('====================================');
   // console.log(order_Data);
   // console.log('====================================');
-
   return (
     <TouchableOpacity
       style={styles.container}
-      onPress={() =>
-        navigation.navigate("ProductDetail", { state: order_Data })
-      }
+      onPress={() => {
+        if (screen === "customerOrders") {
+          navigation.navigate("ProductDetail", { state: order_Data });
+        } else if (screen === "currentOrders" || screen === "pastOrderScreen") {
+          navigation.navigate("StoreKeeperOrderTable", {
+            state: { storeKeeperGetREquestOrder, modal, storeKeeper, screen, navigation, pastOrderAccepted },
+          });
+        }
+      }}
     >
       <View style={styles.card_container}>
         <View style={styles.card_text}>
-          <Text style={{ fontSize: 18, fontWeight: "500" }}>Customer Name</Text>
+          <Text style={{ fontSize: 18, fontWeight: "500" }}>
+            {screen === "customerOrders" ? "Customer Name" : "Salesman Name"}
+          </Text>
           {/* <Text style={{ position: "absolute", right: 10, top: 5 }}>{format(new Date(order_Data.created_at) - new Date(), "H:m")}</Text> */}
-          <Text style={{ position: "absolute", right: 10, top: 5, color: "#009387", fontSize: 11 }}>
-            {formatDistance(new Date(order_Data.created_at), new Date())} ago
+          <Text
+            style={{
+              position: "absolute",
+              right: 10,
+              top: 5,
+              color: "#009387",
+              fontSize: 11,
+            }}
+          >
+            {screen === "currentOrders"
+              ? format(
+                new Date(storeKeeperGetREquestOrder.salesman.created_at),
+                "dd-MMM-yy"
+              )
+              : null}
+            {screen === "pastOrderScreen" ? format(
+              new Date(pastOrderAccepted.created_at),
+              "dd-MMM-yy"
+            ) : null}
+            {screen === "customerOrders"
+              ? formatDistance(new Date(order_Data.created_at), new Date())
+              : null}{" "}
+            ago
           </Text>
           <Text
             style={{
@@ -42,7 +75,12 @@ const CustomerCard = ({
               textTransform: "capitalize",
             }}
           >
-            {order_Data.customer.name}
+            {screen === "currentOrders"
+              ? storeKeeperGetREquestOrder.salesman.name
+              : null}
+            {screen === "pastOrderScreen" ? pastOrderAccepted.salesman.name : "hdfgsjhgvf"}
+            {screen === "customerOrders" ? order_Data.customer.name : null}
+            {/* {order_Data.customer.name} */}
           </Text>
           <Text style={{ fontSize: 18, fontWeight: "500" }}>Details</Text>
           <View style={{ flexDirection: "row", marginTop: 2, marginLeft: 22 }}>
@@ -51,8 +89,21 @@ const CustomerCard = ({
               source={require("../assets/pin.png")}
             />
 
-            <Text style={{ marginTop: -3, paddingLeft: 5, textTransform: "capitalize" }}>
-              {order_Data.customer.address}
+            <Text
+              style={{
+                marginTop: -3,
+                paddingLeft: 5,
+                textTransform: "capitalize",
+              }}
+            >
+              {screen === "currentOrders"
+                ? storeKeeperGetREquestOrder.salesman.email
+                : null}
+              {screen === "pastOrderScreen"
+                ? pastOrderAccepted.salesman.email
+                : null}
+              {screen === "customerOrders" ? order_Data.customer.address : null}
+              {/* {order_Data.customer.address} */}
             </Text>
           </View>
 
@@ -63,7 +114,14 @@ const CustomerCard = ({
             />
 
             <Text style={{ marginTop: -3, paddingLeft: 5 }}>
-              {order_Data.customer.phone}
+              {screen === "currentOrders"
+                ? storeKeeperGetREquestOrder.salesman.phone
+                : null}
+              {screen === "pastOrderScreen"
+                ? pastOrderAccepted.salesman.phone
+                : null}
+              {screen === "customerOrders" ? order_Data.customer.phone : null}
+              {/* {order_Data.customer.phone} */}
             </Text>
           </View>
 

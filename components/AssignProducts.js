@@ -54,7 +54,7 @@ const AssignProducts = ({ }) => {
         });
 
         if (duplicate) {
-            alert("cannot select more than one product");
+            alert("Cannot select more than one product");
             return;
         }
 
@@ -79,7 +79,7 @@ const AssignProducts = ({ }) => {
     const onchangeInput = (val, id) => {
         let foundIndex = selectedProduct.findIndex(x => x.key === id);
         productQuantityCollection[foundIndex] = { pId: id, quantity: val };
-        setProductQuantityCollection([...productQuantityCollection]);
+        ([...productQuantityCollection]);
     }
 
     const getPermissionLocation = async () => {

@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View, FlatList, Dimensions } from "react-nativ
 import React from "react";
 
 export default function NewStockTable({ data }) {
-    console.log('data', data)
+    // console.log('data', data)
     return (
         <View style={styles.dataTable}>
             {/* <FlatList

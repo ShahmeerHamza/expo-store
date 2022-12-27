@@ -4,7 +4,9 @@ import {
     View,
     TextInput,
     TouchableOpacity,
+    Dimensions,
     ActivityIndicator,
+    ScrollView,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -12,18 +14,46 @@ import ProductDropdown from "./ProductDropdown";
 import UserContext from "../context/users/userContext";
 import axios from "axios";
 import { productDetailAdminApi, salesManRequestOrderApi } from "../api";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const OrderForm = ({ navigation }) => {
     const [productQuantity, setproductQuantity] = useState(0);
-    const [selectedId, setSelectedId] = useState(0);
+    const [selectedId, setSelectedId] = useState([]);
     const [data, setData] = useState([]);
     // const [dummyData, setDummyData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingSubmit, setLoadingSubmit] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState([]);
+    const [productQuantityCollection, setProductQuantityCollection] = useState([])
 
     const handleIdSelection = (id) => {
-        setSelectedId(id);
+        // console.log('id', id)
+        // setSelectedId(id);
+        const item = data.find((el) => {
+            return el.key === id;
+        });
+        const temp = [...selectedId];
+        temp.push(item);
+        setSelectedId(temp);
     };
+    // console.log("selectedId", selectedId);
+
+    const onchangeInput = (val, id) => {
+        // console.log('value', val, id)
+        let foundIndex = selectedId.findIndex(x => x.key === id);
+        // console.log('foundIndex', foundIndex)
+        productQuantityCollection[foundIndex] = { pId: id, quantity: val };
+        ([...productQuantityCollection]);
+    }
+    console.log('productQuantityCollection', productQuantityCollection)
+
+    const selectedProductDeleteHandler = (id) => {
+        const newArr1 = productQuantityCollection.filter(item => item.pId !== id);
+        setProductQuantityCollection(newArr1);
+
+        const newArr = selectedId.filter(item => item.key !== id);
+        setSelectedId(newArr);
+    }
 
     const user = useContext(UserContext);
 
@@ -41,13 +71,14 @@ const OrderForm = ({ navigation }) => {
         //     (element) => element.id === selectedId
         // );
 
-        if (!selectedId) {
+        if (!selectedId.length) {
             alert("Please select product!");
             setLoadingSubmit(false);
             return;
-        } else if (!productQuantity) {
+        } else if (selectedId.length !== productQuantityCollection.length) {
+            alert("Enter product quantity");
             setLoadingSubmit(false);
-            return alert("Enter product quantity!");
+            return
         }
         //  else if (selectedProduct?.quantity < productQuantity) {
         //     alert("selected quantity not available!");
@@ -58,10 +89,7 @@ const OrderForm = ({ navigation }) => {
             try {
                 await axios.post(
                     salesManRequestOrderApi,
-                    {
-                        product_id: selectedId,
-                        quantity: productQuantity,
-                    },
+                    { data: productQuantityCollection },
                     headers
                 );
                 setLoadingSubmit(false);
@@ -88,15 +116,15 @@ const OrderForm = ({ navigation }) => {
             });
 
             setData([...data]);
-            setLoading(false)
+            setLoading(false);
         } catch (error) {
             console.log("error", error);
-            setLoading(false)
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        setLoading(true)
+        setLoading(true);
         getAllProduct();
     }, []);
 
@@ -118,8 +146,8 @@ const OrderForm = ({ navigation }) => {
                         />
                     </View>
 
-                    <View style={styles.input_container}>
-                        <Text style={{ fontSize: 20, marginVertical: 20 }}>
+                    <ScrollView style={styles.input_container}>
+                        {/* <Text style={{ fontSize: 20, marginVertical: 20 }}>
                             Product Quantity
                         </Text>
                         <TextInput
@@ -127,8 +155,62 @@ const OrderForm = ({ navigation }) => {
                             placeholder="0"
                             style={styles.input_num}
                             onChangeText={(text) => setproductQuantity(text)}
-                        />
-                    </View>
+                        /> */}
+                        {selectedId.map((item, index) => {
+                            return (
+                                <View
+                                    key={index}
+                                    style={{
+                                        width: (Dimensions.get("window").width / 100) * 70,
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontSize: 17,
+                                            textTransform: "capitalize",
+                                            paddingTop: 8,
+                                        }}
+                                    >
+                                        {item.value}
+                                    </Text>
+                                    <TextInput
+                                        style={{
+                                            width: "100%",
+                                            padding: 10,
+                                            borderBottomWidth: 1,
+                                            fontSize: 15,
+                                        }}
+                                        onChangeText={(val) => {
+                                            onchangeInput(val, item.key);
+                                        }}
+                                        placeholder={`Enter ${item.value} quantity`}
+                                        value={
+                                            productQuantityCollection.find((e) => e?.pId === item.key)
+                                                ?.quantity
+                                        }
+                                        keyboardType="numeric"
+                                    />
+                                    <TouchableOpacity
+                                        onPress={() => selectedProductDeleteHandler(item.key)}
+                                        style={{
+                                            width: 35,
+                                            height: "auto",
+                                            position: "absolute",
+                                            right: 7,
+                                            top: 25,
+                                        }}
+                                    >
+                                        <MaterialCommunityIcons
+                                            name="delete"
+                                            size={29}
+                                            color="#01ab9d"
+                                            style={{}}
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                            );
+                        })}
+                    </ScrollView>
 
                     <TouchableOpacity
                         onPress={handleRequestOrderSubmit}

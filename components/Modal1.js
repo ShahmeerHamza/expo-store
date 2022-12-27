@@ -24,7 +24,7 @@ const Modal1 = ({ setVisible, pastOrder }) => {
                         <Text
                             style={[
                                 styles.containerTxt,
-                                { lineHeight: 18, marginBottom: 5, marginTop: -5 },
+                                { textTransform: "capitalize", lineHeight: 18, marginBottom: 5, marginTop: -5 },
                             ]}
                         >
                             {pastOrder.salesman.name}
@@ -62,7 +62,7 @@ const Modal1 = ({ setVisible, pastOrder }) => {
                         <Text
                             style={[
                                 styles.containerTxt,
-                                { lineHeight: 18, marginBottom: 5, marginTop: -5 },
+                                { textTransform: "capitalize", lineHeight: 18, marginBottom: 5, marginTop: -5 },
                             ]}
                         >
                             {pastOrder.status}
@@ -81,7 +81,7 @@ const Modal1 = ({ setVisible, pastOrder }) => {
                             <Text
                                 style={[
                                     styles.containerTxt,
-                                    { lineHeight: 18, marginBottom: 5, marginTop: -5 },
+                                    { textTransform: "capitalize", lineHeight: 18, marginBottom: 5, marginTop: -5 },
                                 ]}
                             >
                                 {pastOrder.notes}
