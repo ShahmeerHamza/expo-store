@@ -131,6 +131,8 @@ const PastOrders = ({ route }) => {
                 renderItem={({ item }) => {
                   console.log('item. :>> ', item
                   );
+                  if (!item?.product_get.length) return;
+
                   return <CustomerCard
                     pastOrderAccepted={item}
                     navigation={navigation}

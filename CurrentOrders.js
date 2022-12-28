@@ -146,6 +146,8 @@ const CurrentOrders = ({ navigation, route }) => {
                 keyExtractor={(data) => data.id}
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => {
+
+                  if (!item.product_get.length) return;
                   return <CustomerCard
                     storeKeeperGetREquestOrder={item}
                     navigation={navigation}

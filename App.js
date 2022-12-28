@@ -79,7 +79,7 @@ export default function App() {
             />
             <Stack.Screen
               options={{
-                title: "Current Orders details",
+                title: "Orders details",
               }}
               name="StoreKeeperOrderTable"
               component={StoreKeeperOrderTable}

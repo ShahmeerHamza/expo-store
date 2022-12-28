@@ -4,6 +4,8 @@ import { Modal, Portal, Button, Provider } from "react-native-paper";
 const Modal1 = ({ setVisible, pastOrder }) => {
     const hideModal = () => setVisible(false);
 
+    console.log('pastOrder :>> ', pastOrder);
+
     return (
         <Provider>
             <Portal>
@@ -65,10 +67,10 @@ const Modal1 = ({ setVisible, pastOrder }) => {
                                 { textTransform: "capitalize", lineHeight: 18, marginBottom: 5, marginTop: -5 },
                             ]}
                         >
-                            {pastOrder.status}
+                            {pastOrder.pivot.status}
                         </Text>
                     </View>
-                    {pastOrder.status === "rejected" ?
+                    {pastOrder.pivot.status === "rejected" ?
                         <View style={{ flexDirection: "column" }}>
                             <Text
                                 style={[
@@ -84,7 +86,7 @@ const Modal1 = ({ setVisible, pastOrder }) => {
                                     { textTransform: "capitalize", lineHeight: 18, marginBottom: 5, marginTop: -5 },
                                 ]}
                             >
-                                {pastOrder.notes}
+                                {pastOrder.pivot.notes}
                             </Text>
                         </View> : null
                     }

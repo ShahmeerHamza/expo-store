@@ -27,7 +27,7 @@ const StoreKeeperOrderTable = ({ route }) => {
     const [pastOrder, setPastOrders] = useState({});
     const [selectedCurrentOrders, setSelectedCurrentOrders] = useState({});
     const [modalData, setModalData] = useState(null);
-    // console.log('selectedCurrentOrders :>> ', selectedCurrentOrders);
+    // console.log('pastOrderAccepted.salesman :>> ', pastOrderAccepted.salesman);
     return (
         <>
             {storeKeeperGetREquestOrder?.product_get.length ||
@@ -84,15 +84,18 @@ const StoreKeeperOrderTable = ({ route }) => {
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item, index }) => {
                             if (screen === "currentOrders" && item.pivot.status !== "pending") return;
-                            console.log("item :>> ", item);
 
                             return (
                                 <DataTable.Row
                                     onPress={() => {
-                                        setSelectedCurrentOrders(item);
-                                        setVisible(true);
-                                        setVisible1(true);
-                                        setModalData(item);
+                                        if (screen === "currentOrders") {
+                                            setSelectedCurrentOrders(item);
+                                            setVisible(true);
+                                        } else {
+                                            console.log(item);
+                                            setPastOrders({ ...item, salesman: { name: pastOrderAccepted?.salesman?.name, phone: pastOrderAccepted?.salesman?.phone } });
+                                            setVisible1(true);
+                                        }
                                     }}
                                 >
                                     <DataTable.Cell
@@ -107,8 +110,8 @@ const StoreKeeperOrderTable = ({ route }) => {
                                         style={{ flex: 2.5 }}
                                     >
                                         {screen === "currentOrders"
-                                            ? storeKeeperGetREquestOrder.salesman.name
-                                            : pastOrderAccepted.salesman.name}
+                                            ? storeKeeperGetREquestOrder.salesman?.name
+                                            : pastOrderAccepted.salesman?.name}
                                     </DataTable.Cell>
                                     <DataTable.Cell
                                         textStyle={{ textTransform: "capitalize" }}

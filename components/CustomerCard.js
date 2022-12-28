@@ -62,8 +62,7 @@ const CustomerCard = ({
             ) : null}
             {screen === "customerOrders"
               ? formatDistance(new Date(order_Data.created_at), new Date())
-              : null}{" "}
-            ago
+              : null}
           </Text>
           <Text
             style={{
@@ -78,7 +77,7 @@ const CustomerCard = ({
             {screen === "currentOrders"
               ? storeKeeperGetREquestOrder.salesman.name
               : null}
-            {screen === "pastOrderScreen" ? pastOrderAccepted.salesman.name : "hdfgsjhgvf"}
+            {screen === "pastOrderScreen" ? pastOrderAccepted.salesman.name : null}
             {screen === "customerOrders" ? order_Data.customer.name : null}
             {/* {order_Data.customer.name} */}
           </Text>
