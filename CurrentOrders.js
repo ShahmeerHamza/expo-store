@@ -19,7 +19,7 @@ const CurrentOrders = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(true);
   const [currentOrdersData, setCurrentOrdersData] = useState([]);
-  // console.log("currentOrdersData", currentOrdersData);
+  console.log("currentOrdersData", currentOrdersData);
 
   const user = useContext(UserContext);
 
@@ -37,9 +37,17 @@ const CurrentOrders = ({ navigation, route }) => {
   };
 
   const getOrders = async () => {
+    // let arr = [];
+
     try {
       const response = await axios.get(OrdersApi, headers);
       const { data } = _response(response);
+      // data.forEach(element => {
+      //   if (element?.product_get?.length) {
+      //     arr.push(data);
+      //   }
+      // });
+      // console.log('arr :>> ', arr);
       setCurrentOrdersData(data);
       // console.log('data :>> ', data);
       setLoading(false);

@@ -43,13 +43,13 @@ export default function App() {
               },
             }}
           >
-            <Stack.Screen
+            {/* <Stack.Screen
               options={{
                 title: "Welcome",
               }}
               name="Splash"
               component={SplashScreen}
-            />
+            /> */}
 
             <Stack.Screen
               options={{
