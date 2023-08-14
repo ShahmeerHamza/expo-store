@@ -49,21 +49,23 @@ const AssignProducts = ({ }) => {
     };
 
     const handleProductSelection = (id) => {
-        const duplicate = selectedProduct.find((el) => {
-            return el.key === id;
-        });
+        // const duplicate = selectedProduct.find((el) => {
+        //     return el.key === id;
+        // });
 
-        if (duplicate) {
-            alert("Cannot select more than one product");
-            return;
-        }
+        // if (duplicate) {
+        //     alert("Cannot select more than one product");
+        //     return;
+        // }
 
         const item = data.find((el) => {
             return el.key === id;
         });
-        const temp = [...selectedProduct];
-        temp.push(item);
-        setSelectedProduct(temp);
+        // const temp = [...productQuantityCollection];
+        // temp.push(item);
+        // setProductQuantityCollection(temp);
+        productQuantityCollection.push({ ...item, uid: generateFourDigitId() })
+        setProductQuantityCollection([...productQuantityCollection]);
     };
 
     const user = useContext(UserContext);
@@ -76,10 +78,22 @@ const AssignProducts = ({ }) => {
         },
     };
 
-    const onchangeInput = (val, id) => {
-        let foundIndex = selectedProduct.findIndex(x => x.key === id);
-        productQuantityCollection[foundIndex] = { pId: id, quantity: val };
-        ([...productQuantityCollection]);
+    function generateFourDigitId() {
+        const date = new Date();
+        const time = date.getTime();  // number of milliseconds since 1970
+        const id = time % 10000;  // use the last four digits
+        return id;
+    }
+
+    const onchangeInput = (val, index, id, pName, uid) => {
+        if (val.trim() == "" || val.trim() == 0) return;
+
+        // let foundIndex = productQuantityCollection.findIndex((x, ind) => ind === index);
+        // setFound_Index(foundIndex)
+        // productQuantityCollection[foundIndex] = { pId: id, quantity: val };
+        // setProductQuantityCollection([...productQuantityCollection]);
+        productQuantityCollection[index] = { key: id, quantity: val, value: pName, uid };
+        setProductQuantityCollection([...productQuantityCollection]);
     }
 
     const getPermissionLocation = async () => {
@@ -98,9 +112,23 @@ const AssignProducts = ({ }) => {
         });
     }
 
+    function hasQuantityKey(array) {
+        for (let i = 0; i < array.length; i++) {
+            if (!array[i].hasOwnProperty('quantity')) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     const handleRequestOrderSubmit = async () => {
         // console.log(selectedProduct);
-        // console.log(productQuantityCollection);
+        let temp = [];
+
+        productQuantityCollection.forEach((e) => {
+            temp.push({ pId: e.key, quantity: e.quantity });
+        });
+
 
         if (!location.longitude || !location.latitude) {
             getPermissionLocation();
@@ -108,6 +136,7 @@ const AssignProducts = ({ }) => {
         }
 
         setLoadingSubmit(true)
+
         if (status === "visit") {
             try {
                 await axios.post(salesManPlaceOrderApi, {
@@ -134,22 +163,23 @@ const AssignProducts = ({ }) => {
                 alert("Please select customer name!");
                 setLoadingSubmit(false);
                 return;
-            } else if (!selectedProduct.length) {
+            } else if (!productQuantityCollection.length) {
                 alert("Select product name");
                 setLoadingSubmit(false)
                 return;
             }
-            else if (selectedProduct.length !== productQuantityCollection.length) {
+            else if (!hasQuantityKey(productQuantityCollection)) {
                 alert("Enter product quantity");
                 setLoadingSubmit(false);
                 return
             }
             else {
+
                 try {
                     await axios.post(salesManPlaceOrderApi, {
                         customer_id: selectedId,
                         visit_status: status.toLocaleLowerCase(),
-                        products: productQuantityCollection,
+                        products: temp,
                         longitude: location.longitude,
                         latitude: location.latitude,
                         deliver_date: new Date(),
@@ -159,7 +189,6 @@ const AssignProducts = ({ }) => {
                     setLoadingSubmit(false);
                     alert("product successfully ordered");
                     navigation.navigate("Home");
-                    console.log('productQuantityCollection', productQuantityCollection)
 
                 } catch (error) {
                     console.log(error);
@@ -210,12 +239,20 @@ const AssignProducts = ({ }) => {
     }, [isFocused]);
 
     const selectedProductDeleteHandler = (id) => {
-        const newArr1 = productQuantityCollection.filter(item => item.pId !== id);
-        setProductQuantityCollection(newArr1);
 
-        const newArr = selectedProduct.filter(item => item.key !== id);
-        setSelectedProduct(newArr);
+        // setProductQuantityCollection([...productQuantityCollection]);
+        const deletedItem = productQuantityCollection.filter((item) => item.uid !== id)
+        console.log('deletedItem :>> ', deletedItem);
+        setProductQuantityCollection(deletedItem);
+
+        // const newArr1 = productQuantityCollection.filter(item => item.pId !== id);
+        // setProductQuantityCollection(newArr1);
+
+        // const newArr = selectedProduct.filter(item => item.key !== id);
+        // setSelectedProduct(newArr);
     }
+    console.log('productQuantityCollection :>> ', productQuantityCollection);
+
 
     return (
         <>
@@ -278,7 +315,8 @@ const AssignProducts = ({ }) => {
                                         data={selectedProduct}
                                         keyExtractor={(item) => item.id}
                                         renderItem={({ item }) => { */}
-                                    {selectedProduct.map((item, index) => {
+                                    {productQuantityCollection.map((item, index) => {
+                                        // console.log('item :>> ', item);
                                         return (
                                             <View
                                                 key={index}
@@ -302,13 +340,14 @@ const AssignProducts = ({ }) => {
                                                         borderBottomWidth: 1,
                                                         fontSize: 15,
                                                     }}
-                                                    onChangeText={(val) => { onchangeInput(val, item.key) }}
+                                                    // onChangeText={(val) => { onchangeInput(val, item.key) }}
+                                                    onChangeText={(val) => { onchangeInput(val, index, item?.key, item.value, item.uid) }}
                                                     placeholder={`Enter ${item.value} quantity`}
-                                                    value={productQuantityCollection.find((e) => e?.pId === item.key)?.quantity}
+                                                    value={productQuantityCollection[index].quantity}
                                                     keyboardType="numeric"
                                                 />
                                                 <TouchableOpacity
-                                                    onPress={() => selectedProductDeleteHandler(item.key)}
+                                                    onPress={() => selectedProductDeleteHandler(item?.uid)}
                                                     style={{
                                                         width: 35,
                                                         height: "auto",

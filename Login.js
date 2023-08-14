@@ -25,8 +25,8 @@ const Login = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string().required().email().label("Email"),
-    password: Yup.string().required().min(6).label("Password"),
+    // email: Yup.string().required().email().label("Email"),
+    // password: Yup.string().required().min(6).label("Password"),
   });
 
   const { login } = api;
@@ -43,6 +43,7 @@ const Login = ({ navigation }) => {
   };
 
   const handleLogin = async (userData, resetForm) => {
+    if (!userData.email || !userData.password) return
     setLoading(true);
     // console.log(userData);
 
@@ -74,6 +75,7 @@ const Login = ({ navigation }) => {
 
         setLoading(false);
         navigation.navigate("Home");
+        setIsUserNotFound(false);
         resetForm();
       } else {
         setIsUserNotFound(true);
@@ -114,7 +116,7 @@ const Login = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
         >
           <AppForm
-            validationSchema={validationSchema}
+            // validationSchema={validationSchema}
             initialValues={{
               email: "",
               password: "",
@@ -126,7 +128,7 @@ const Login = ({ navigation }) => {
             <View style={[styles.action, styles.shadow]}>
               <FontAwesome name="user" color="#009387" size={20} />
               <AppFormField
-                placeholder=" Your Email"
+                // placeholder=" Your Email"
                 style={styles.textInput}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -138,7 +140,7 @@ const Login = ({ navigation }) => {
             <View style={[styles.action, styles.shadow]}>
               <FontAwesome name="lock" color="#009387" size={20} />
               <AppFormField
-                placeholder=" Your Password"
+                // placeholder=" Your Password"
                 style={styles.textInput}
                 secureTextEntry={securePassword}
                 autoCapitalize="none"
@@ -153,12 +155,12 @@ const Login = ({ navigation }) => {
                 )}
               </TouchableOpacity>
             </View>
-
-            <ErrorMessages
+            {isUserNotFound ? <ErrorMessages
               style={{ marginTop: 10, marginLeft: 5 }}
               error={"Incorrect email or password. Please try again."}
               visible={isUserNotFound}
-            />
+            /> : null}
+
 
             <SubmitButton tittle="Login" loading={loading} />
           </AppForm>
